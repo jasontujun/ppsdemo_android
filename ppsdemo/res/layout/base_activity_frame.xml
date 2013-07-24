@@ -4,10 +4,10 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
         >
-    <TextView
+    <!--内容，拖动图层-->
+    <android.support.v4.view.ViewPager
+            android:id="@+id/drag_frame"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Hello World, MainActivity"
-            />
+            android:layout_height="fill_parent"/>
 </LinearLayout>
 
