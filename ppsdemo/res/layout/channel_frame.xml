@@ -78,35 +78,26 @@
                 android:background="@drawable/ic_clear_entry_s"/>
     </RelativeLayout>
     <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/gray"/>
+            android:layout_width="fill_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/gray"/>
     <!--标签栏-->
     <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:orientation="horizontal"
             android:background="@color/light_gray">
         <!--tab1-->
-        <RelativeLayout
+        <TextView
+                android:id="@+id/tab_txt1"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="1">
-            <TextView
-                    android:id="@+id/tab_txt1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="最热"
-                    android:textSize="15sp"
-                    android:textColor="@color/black"/>
-            <ImageView
-                    android:id="@+id/tab_tip1"
-                    android:layout_width="fill_parent"
-                    android:layout_height="3dp"
-                    android:layout_alignParentBottom="true"
-                    android:src="@color/orange"/>
-        </RelativeLayout>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="最热"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:background="@drawable/bg_transparent_orange"/>
         <ImageView
                 android:layout_width="1dp"
                 android:layout_height="fill_parent"
@@ -114,25 +105,16 @@
                 android:layout_marginBottom="10dp"
                 android:background="@color/gray"/>
         <!--tab2-->
-        <RelativeLayout
+        <TextView
+                android:id="@+id/tab_txt2"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="1">
-            <TextView
-                    android:id="@+id/tab_txt2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="最新"
-                    android:textSize="15sp"
-                    android:textColor="@color/black"/>
-            <ImageView
-                    android:id="@+id/tab_tip2"
-                    android:layout_width="fill_parent"
-                    android:layout_height="3dp"
-                    android:layout_alignParentBottom="true"
-                    android:src="@color/orange"/>
-        </RelativeLayout>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="最新"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:background="@drawable/bg_transparent_orange"/>
         <ImageView
                 android:layout_width="1dp"
                 android:layout_height="fill_parent"
@@ -140,25 +122,16 @@
                 android:layout_marginBottom="10dp"
                 android:background="@color/gray"/>
         <!--tab3-->
-        <RelativeLayout
+        <TextView
+                android:id="@+id/tab_txt3"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="1">
-            <TextView
-                    android:id="@+id/tab_txt3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="评分"
-                    android:textSize="15sp"
-                    android:textColor="@color/black"/>
-            <ImageView
-                    android:id="@+id/tab_tip3"
-                    android:layout_width="fill_parent"
-                    android:layout_height="3dp"
-                    android:layout_alignParentBottom="true"
-                    android:src="@color/orange"/>
-        </RelativeLayout>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="评分"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:background="@drawable/bg_transparent_orange"/>
         <ImageView
                 android:layout_width="1dp"
                 android:layout_height="fill_parent"
@@ -166,33 +139,31 @@
                 android:layout_marginBottom="10dp"
                 android:background="@color/gray"/>
         <!--tab4-->
-        <RelativeLayout
+        <TextView
+                android:id="@+id/tab_txt1"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_weight="1">
-            <TextView
-                    android:id="@+id/tab_txt1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="字母"
-                    android:textSize="15sp"
-                    android:textColor="@color/black"/>
-            <ImageView
-                    android:id="@+id/tab_tip1"
-                    android:layout_width="fill_parent"
-                    android:layout_height="3dp"
-                    android:layout_alignParentBottom="true"
-                    android:src="@color/orange"/>
-        </RelativeLayout>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="字母"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:background="@drawable/bg_transparent_orange"/>
     </LinearLayout>
+    <!--tab标签栏提示-->
+    <ImageView
+            android:id="@+id/tab_tip"
+            android:layout_width="fill_parent"
+            android:layout_height="3dp"
+            android:layout_alignParentBottom="true"
+            android:src="@color/orange"/>
     <ImageView
             android:layout_width="fill_parent"
             android:layout_height="0.5dp"
             android:background="@color/gray"/>
     <!--内容栏（用于展示listview或gridview）-->
     <FrameLayout
-        android:id="@+id/content_list_grid_frame"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"/>
+            android:id="@+id/content_list_grid_frame"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"/>
 </LinearLayout>

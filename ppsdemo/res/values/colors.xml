@@ -15,6 +15,7 @@
     <color name="dark_blue">#ff464696</color>
     <color name="light_pink">#eeffdddd</color>
 
+    <color name="dark_white">#fff3f3f3</color>
     <color name="light_gray">#ffdddddd</color>
     <color name="gray">#ffcdcdcd</color>
     <color name="dark_gray">#ff8c8c8c</color>
