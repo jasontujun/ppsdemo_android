@@ -12,7 +12,12 @@ public class SourceName {
     public static final String GLOBAL_STATE = "global";
 
     /**
-     * 所有城市的数据源
+     * 节目（列表）的数据源
      */
-    public static final String ALL_PROGRAM = "allProgram";
+    public static final String PROGRAM_BASE = "programBase";
+
+    /**
+     * 节目（详情）的数据源
+     */
+    public static final String PROGRAM_DETAIL = "programDetail";
 }

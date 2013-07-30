@@ -6,6 +6,8 @@ import com.xengine.android.data.db.XSQLiteHelper;
 import com.xengine.android.system.file.XAndroidFileMgr;
 import com.xengine.android.system.file.XFileMgr;
 import tv.pps.tj.ppsdemo.data.cache.GlobalStateSource;
+import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
+import tv.pps.tj.ppsdemo.data.cache.ProgramDetailSource;
 import tv.pps.tj.ppsdemo.session.HttpClientHolder;
 
 import java.io.File;
@@ -89,6 +91,8 @@ public class SystemMgr {
         DefaultDataRepo repo = DefaultDataRepo.getInstance();
 
         repo.registerDataSource(new GlobalStateSource(context));
+        repo.registerDataSource(new ProgramBaseSource());
+        repo.registerDataSource(new ProgramDetailSource());
     }
 
     public void clearSystem() {

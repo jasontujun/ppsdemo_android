@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import com.xengine.android.data.cache.XDataSource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * 记录全局都要用到的状态。
  * 存储在SharedPreferences中。
@@ -21,11 +18,7 @@ public class GlobalStateSource implements XDataSource {
 
     private SharedPreferences pref;
 
-    private static final String CITY_LIST_UPDATE_TIME_STAMP = "cityListUpdateTimeStamp";
-
-    private static final String SELECT_CITY_INDEX = "selectCityIndex";
-
-    private List<XCityIndexListener> mCityIndexListeners;
+    private static final String PROGRAM_LIST_XML_TIME_STAMP = "programListXmlTimeStamp";
 
     /**
      * 全局状态数据源
@@ -33,7 +26,6 @@ public class GlobalStateSource implements XDataSource {
      */
     public GlobalStateSource(Context context) {
         pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        mCityIndexListeners = new ArrayList<XCityIndexListener>();
     }
 
     @Override
@@ -41,45 +33,13 @@ public class GlobalStateSource implements XDataSource {
         return SourceName.GLOBAL_STATE;
     }
 
-    public long getCityListUpdateTimeStamp() {
-        return pref.getLong(CITY_LIST_UPDATE_TIME_STAMP, 0);
+    public long getProgramListXmlUpdateTimeStamp() {
+        return pref.getLong(PROGRAM_LIST_XML_TIME_STAMP, 0);
     }
 
-    public void setCityListUpdateTimeStamp(long timeStamp) {
+    public void setProgramListXmlUpdateTimeStamp(long timeStamp) {
         SharedPreferences.Editor editor = pref.edit();
-        editor.putLong(CITY_LIST_UPDATE_TIME_STAMP, timeStamp);
+        editor.putLong(PROGRAM_LIST_XML_TIME_STAMP, timeStamp);
         editor.commit();
-    }
-
-    public int getSelectCityIndex() {
-        return pref.getInt(SELECT_CITY_INDEX, -1);
-    }
-
-    public void setSelectCityIndex(int selectCityIndex) {
-        int oldIndex = getSelectCityIndex();
-        if (oldIndex == selectCityIndex)
-            return;
-
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putInt(SELECT_CITY_INDEX, selectCityIndex);
-        editor.commit();
-        for (XCityIndexListener listener : mCityIndexListeners)
-            listener.onChange(selectCityIndex);
-    }
-
-    public void registerSelectCityIndexListener(XCityIndexListener listener) {
-        if (listener != null)
-            mCityIndexListeners.add(listener);
-    }
-
-    public void unregisterSelectCityIndexListener(XCityIndexListener listener) {
-        mCityIndexListeners.remove(listener);
-    }
-
-    /**
-     * 当前显示城市的索引
-     */
-    public interface XCityIndexListener  {
-        void onChange(int i);
     }
 }

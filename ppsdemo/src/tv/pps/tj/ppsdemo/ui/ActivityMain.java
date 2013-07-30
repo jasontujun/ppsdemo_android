@@ -98,6 +98,9 @@ public class ActivityMain extends FragmentActivity {
             super(fm);
             mLeftMenuFragment = new FragmentLeftMenu();
             mMiddleContentFragment = new FragmentChannel();
+            Bundle args = new Bundle();
+            args.putInt("mode", FragmentChannel.MODE_LISTVIEW);
+            mMiddleContentFragment.setArguments(args);
 
             // 计算左边栏的宽度比例
             XScreen screen = new XAndroidScreen(ActivityMain.this);
