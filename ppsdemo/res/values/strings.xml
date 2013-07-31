@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ppsdemo</string>
+
+    <!--主机地址-->
+    <string name="host">http://list1.ppstream.com/mobile/newipadc/</string>
+
+    <!--api-->
+    <string name="program_list">sub/</string>
+    <string name="program_detail">getgetgetdetail/</string>
 </resources>

@@ -12,6 +12,11 @@ public class SourceName {
     public static final String GLOBAL_STATE = "global";
 
     /**
+     * 图片本地sd卡缓存数据源
+     */
+    public static final String IMAGE = "image";
+
+    /**
      * 节目（列表）的数据源
      */
     public static final String PROGRAM_BASE = "programBase";

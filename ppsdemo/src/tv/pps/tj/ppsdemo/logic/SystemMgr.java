@@ -34,7 +34,7 @@ public class SystemMgr {
 
 
     /**
-     * 在第一个Activity加载时执行
+     * 在第一个Activity加载时执行.(少量快速)
      * @param context
      */
     private void preInit(Context context) {
