@@ -33,6 +33,7 @@ public class ActivityMain extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         // 初始化系统相关组件
+        SystemMgr.getInstance().initEngine(getApplicationContext());
         SystemMgr.getInstance().initSystem(getApplicationContext());
 
         // ui
@@ -100,6 +101,7 @@ public class ActivityMain extends FragmentActivity {
             mMiddleContentFragment = new FragmentChannel();
             Bundle args = new Bundle();
             args.putInt("mode", FragmentChannel.MODE_LISTVIEW);
+            args.putString("name", "内地剧场");
             mMiddleContentFragment.setArguments(args);
 
             // 计算左边栏的宽度比例

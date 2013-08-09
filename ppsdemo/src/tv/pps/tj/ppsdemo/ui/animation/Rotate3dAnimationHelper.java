@@ -39,10 +39,7 @@ public class Rotate3dAnimationHelper {
      * @param toBack 是否翻找到背面。
      */
     public void rotate3d(boolean toBack) {
-        if (toBack)
-            applyRotation(toBack, 0, 90);
-        else
-            applyRotation(toBack, 180, 270);
+        applyRotation(toBack, 0, 90);
     }
 
     /**
@@ -114,15 +111,13 @@ public class Rotate3dAnimationHelper {
                 mFrontView.setVisibility(View.GONE);
                 mBackView.setVisibility(View.VISIBLE);
                 mBackView.requestFocus();
-
-                rotation = new Rotate3dAnimation(90, 180, centerX, centerY, 310.0f, false);
             } else {
                 mBackView.setVisibility(View.GONE);
                 mFrontView.setVisibility(View.VISIBLE);
                 mFrontView.requestFocus();
-
-                rotation = new Rotate3dAnimation(270, 360, centerX, centerY, 310.0f, false);
             }
+            // TIP2: 第二个翻转动画是从270~360度，从而避免翻转后backView是反的
+            rotation = new Rotate3dAnimation(270, 360, centerX, centerY, 310.0f, false);
 
 
             rotation.setDuration(500);

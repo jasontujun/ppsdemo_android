@@ -1,15 +1,21 @@
 package tv.pps.tj.ppsdemo.ui;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
+import com.xengine.android.data.cache.DefaultDataRepo;
+import com.xengine.android.data.cache.XDataChangeListener;
+import com.xengine.android.media.image.loader.XScrollRemoteLoader;
+import com.xengine.android.media.image.processor.XImageProcessor;
 import tv.pps.tj.ppsdemo.R;
+import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
+import tv.pps.tj.ppsdemo.data.cache.SourceName;
 import tv.pps.tj.ppsdemo.data.model.ProgramBase;
+import tv.pps.tj.ppsdemo.engine.MyImageScrollRemoteLoader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,33 +25,35 @@ import java.util.List;
  * Time: 上午9:19
  * To change this template use File | Settings | File Templates.
  */
-public class AdapterProgramListView extends BaseAdapter {
+public class AdapterProgramListView extends BaseAdapter
+        implements AbsListView.OnScrollListener, XDataChangeListener<ProgramBase> {
 
     private Context mContext;
-    private List<ProgramBase> mProgramBases;
+    private ProgramBaseSource mProgramBaseSource;
+    // 图片加载器
+    private XScrollRemoteLoader mImageScrollLoader;
 
     public AdapterProgramListView(Context context) {
         mContext = context;
-        mProgramBases = new ArrayList<ProgramBase>();
+        mProgramBaseSource = (ProgramBaseSource) DefaultDataRepo.
+                getInstance().getSource(SourceName.PROGRAM_BASE);
+        mImageScrollLoader = MyImageScrollRemoteLoader.getInstance();
     }
-
-
 
     @Override
     public int getCount() {
-        return mProgramBases.size();
+        return mProgramBaseSource.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return mProgramBases.get(i);
+        return mProgramBaseSource.get(i);
     }
 
     @Override
     public long getItemId(int i) {
         return i;
     }
-
 
     private class ViewHolder {
         public View frame;
@@ -92,7 +100,83 @@ public class AdapterProgramListView extends BaseAdapter {
                 holder.programRankView.setVisibility(View.GONE);
                 break;
         }
+        holder.programNameView.setText(programBase.getName());
+        holder.programTypeView.setText(programBase.getType());
+        holder.onlineNumberView.setText("" + programBase.getOnlineNumber());
+        float score = programBase.getVote();
+        holder.programScoreView.setText("" + score);
+        if (score > 9) {
+            holder.programScoreView.setTextColor(mContext.getResources().getColor(R.color.red));
+        } else if (score > 6) {
+            holder.programScoreView.setTextColor(mContext.getResources().getColor(R.color.dark_orange));
+        } else {
+            holder.programScoreView.setTextColor(mContext.getResources().getColor(R.color.orange));
+        }
+
+        // 异步加载图片
+        mImageScrollLoader.asyncLoadBitmap(mContext, programBase.getPosterUrl(),
+                holder.programImageView, XImageProcessor.ImageSize.SCREEN, null);
 
         return convertView;
     }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        switch (scrollState) {
+            case AbsListView.OnScrollListener.SCROLL_STATE_FLING:
+                mImageScrollLoader.onScroll();
+                break;
+            case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
+                mImageScrollLoader.onIdle();
+                break;
+            case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+                mImageScrollLoader.onScroll();
+                break;
+            default:
+                break;
+        }
+    }
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem,
+                         int visibleItemCount, int totalItemCount) {
+    }
+
+    @Override
+    public void onChange() {
+        postNotifyDataChange();
+    }
+
+    @Override
+    public void onAdd(ProgramBase cityDetailInfo) {
+        postNotifyDataChange();
+    }
+
+    @Override
+    public void onAddAll(List<ProgramBase> cityDetailInfos) {
+        postNotifyDataChange();
+    }
+
+    @Override
+    public void onDelete(ProgramBase cityDetailInfo) {
+        postNotifyDataChange();
+    }
+
+    @Override
+    public void onDeleteAll(List<ProgramBase> cityDetailInfos) {
+        postNotifyDataChange();
+    }
+
+
+    private void postNotifyDataChange() {
+        changeHandler.sendEmptyMessage(0);
+    }
+
+    private Handler changeHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == 0) {
+                notifyDataSetChanged();
+            }
+        }
+    };
 }

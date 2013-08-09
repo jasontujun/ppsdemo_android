@@ -19,6 +19,7 @@ public class GlobalStateSource implements XDataSource {
     private SharedPreferences pref;
 
     private static final String PROGRAM_LIST_XML_TIME_STAMP = "programListXmlTimeStamp";
+    private static final String PROGRAM_LIST_XML_FILE_NAME = "programListXmlFileName";
 
     /**
      * 全局状态数据源
@@ -40,6 +41,16 @@ public class GlobalStateSource implements XDataSource {
     public void setProgramListXmlUpdateTimeStamp(long timeStamp) {
         SharedPreferences.Editor editor = pref.edit();
         editor.putLong(PROGRAM_LIST_XML_TIME_STAMP, timeStamp);
+        editor.commit();
+    }
+
+    public String getProgramListXmlFileName() {
+        return pref.getString(PROGRAM_LIST_XML_FILE_NAME, null);
+    }
+
+    public void setProgramListXmlFileName(String fileName) {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(PROGRAM_LIST_XML_FILE_NAME, fileName);
         editor.commit();
     }
 }

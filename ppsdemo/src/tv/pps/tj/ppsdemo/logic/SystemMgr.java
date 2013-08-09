@@ -3,12 +3,16 @@ package tv.pps.tj.ppsdemo.logic;
 import android.content.Context;
 import com.xengine.android.data.cache.DefaultDataRepo;
 import com.xengine.android.data.db.XSQLiteHelper;
+import com.xengine.android.media.graphics.XAndroidScreen;
+import com.xengine.android.media.graphics.XScreen;
 import com.xengine.android.system.file.XAndroidFileMgr;
 import com.xengine.android.system.file.XFileMgr;
+import tv.pps.tj.ppsdemo.R;
 import tv.pps.tj.ppsdemo.data.cache.GlobalStateSource;
+import tv.pps.tj.ppsdemo.data.cache.ImageSource;
 import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
 import tv.pps.tj.ppsdemo.data.cache.ProgramDetailSource;
-import tv.pps.tj.ppsdemo.session.HttpClientHolder;
+import tv.pps.tj.ppsdemo.engine.*;
 
 import java.io.File;
 
@@ -32,45 +36,62 @@ public class SystemMgr {
 
     public static final int DIR_DATA_XML = 20;
 
-
     /**
-     * 在第一个Activity加载时执行.(少量快速)
+     * 初始化xengine的一些重要模块。
+     * 在第一个Activity的最开始执行。
      * @param context
      */
-    private void preInit(Context context) {
-        // 初始化文件管理器
+    public void initEngine(Context context) {
+        // 初始化文件管理模块
         XFileMgr fileMgr = XAndroidFileMgr.getInstance();
-        fileMgr.setRootName("pm25");
+        fileMgr.setRootName("ppsdemo");
         fileMgr.setDir(XFileMgr.FILE_TYPE_TMP, "tmp", true);
         fileMgr.setDir(XFileMgr.FILE_TYPE_PHOTO, "photo", true);
-        // 初始化网络
+        fileMgr.setDir(DIR_DATA_XML, "data" + File.separator + "xml", false);
+        // 初始化网络模块
+        XScreen screen = new XAndroidScreen(context);
         HttpClientHolder.init(context);
+        DownloadMgrHolder.init(HttpClientHolder.getImageHttpClient(),
+                screen.getScreenWidth(), screen.getScreenHeight());
+        UploadMgrHolder.init(HttpClientHolder.getImageHttpClient());
+        // 初始化图片加载模块
+        MyImageViewLocalLoader.getInstance().init(
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small
+        );
+        MyImageSwitcherLocalLoader.getInstance().init(
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small
+        );
+        MyImageScrollLocalLoader.getInstance().init(
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small
+        );
+        MyImageScrollRemoteLoader.getInstance().init(
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small,
+                R.drawable.default_image_bg_small
+        );
         // 初始化手机功能管理器
-//        XScreen screen = new XAndroidScreen(context);
 //        mMobileMgr = new XAndroidMobileMgr(this, screen.getScreenWidth(), screen.getScreenHeight());
     }
-
 
     /**
      * 初始化系统。
      * @param context
      */
     public void initSystem(Context context) {
-        preInit(context);
-        clearSystem();
-        initFileMgr();
         initDB(context);
         initDataSources(context);
     }
 
-    private void initFileMgr() {
-        // 文件夹管理器
-        XFileMgr fileMgr = XAndroidFileMgr.getInstance();
-        fileMgr.setDir(DIR_DATA_XML, "data" + File.separator + "xml", false);
-        // 图片下载管理器
-//        ImgMgrHolder.getImgDownloadMgr().setDownloadDirectory(
-//                fileMgr.getDir(XFileMgr.FILE_TYPE_TMP).getAbsolutePath());
-    }
 
     /**
      * 初始化数据库
@@ -89,15 +110,18 @@ public class SystemMgr {
      */
     private void initDataSources(Context context) {
         DefaultDataRepo repo = DefaultDataRepo.getInstance();
-
         repo.registerDataSource(new GlobalStateSource(context));
+        repo.registerDataSource(new ImageSource());
         repo.registerDataSource(new ProgramBaseSource());
         repo.registerDataSource(new ProgramDetailSource());
     }
 
     public void clearSystem() {
         // clear image cache
-//        ImageLoader.getInstance().clearImageCache();
+        MyImageViewLocalLoader.getInstance().clearImageCache();
+        MyImageSwitcherLocalLoader.getInstance().clearImageCache();
+        MyImageScrollLocalLoader.getInstance().clearImageCache();
+        MyImageScrollRemoteLoader.getInstance().clearImageCache();
 
         // clear tmp file
         XAndroidFileMgr.getInstance().clearDir(XFileMgr.FILE_TYPE_TMP);

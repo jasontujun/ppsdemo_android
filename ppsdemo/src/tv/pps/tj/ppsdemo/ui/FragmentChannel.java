@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.xengine.android.utils.XStringUtil;
 import tv.pps.tj.ppsdemo.R;
+import tv.pps.tj.ppsdemo.logic.ProgramMgr;
 import tv.pps.tj.ppsdemo.ui.animation.Rotate3dAnimationHelper;
 
 /**
@@ -40,7 +41,10 @@ public class FragmentChannel extends Fragment {
     private RelativeLayout mProgramContentFrame;
     private ListView mProgramListView;// 节目的列表界面
     private GridView mProgramGridView;// 节目的网格界面
-    private View mAllLoadingFrame;// 整个节目加载提示 \
+    private AdapterProgramListView mProgramListViewAdapter;
+    private AdapterProgramGridView mProgramGridViewAdapter;
+
+    private View mAllLoadingFrame;// 整个节目加载提示
     private ProgressBar mAllLoadingProgressBar;
     private TextView mAllLoadingTextView;
     private View mListLoadingFrame;// 列表加载提示
@@ -56,7 +60,6 @@ public class FragmentChannel extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout containing a title and body text.
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.channel_frame, container, false);
         mMenuBtn = (ImageView) rootView.findViewById(R.id.menu_btn);
         mModeBtn = (ImageView) rootView.findViewById(R.id.mode_btn);
@@ -77,7 +80,6 @@ public class FragmentChannel extends Fragment {
         mAllLoadingProgressBar = (ProgressBar) rootView.findViewById(R.id.all_loading_progressbar);
         mAllLoadingTextView = (TextView) rootView.findViewById(R.id.all_loading_txt);
         mListLoadingFrame = rootView.findViewById(R.id.list_loading_frame);
-
 
         // 初始化监听
         mMenuBtn.setOnClickListener(mMenuBtnListener);  // 设置菜单按钮的监听
@@ -147,9 +149,15 @@ public class FragmentChannel extends Fragment {
             }
         });
 
+        // 初始化列表
+        mProgramListViewAdapter = new AdapterProgramListView(getActivity());
+        mProgramListView.setAdapter(mProgramListViewAdapter);
+        mProgramListView.setOnScrollListener(mProgramListViewAdapter);
+        mProgramGridViewAdapter = new AdapterProgramGridView(getActivity());
+        mProgramGridView.setAdapter(mProgramGridViewAdapter);
+        mProgramGridView.setOnScrollListener(mProgramGridViewAdapter);
+
         // 初始化显示模式(上次用户是列表模式还是网格模式)
-        mModeChangeAnimation = false;
-        String currentChannelName = getArguments().getString("name");
         mCurrentMode = getArguments().getInt("mode");// TODO 传进来的参数
         if (mCurrentMode == MODE_LISTVIEW) {
             mProgramListView.setVisibility(View.VISIBLE);
@@ -161,6 +169,9 @@ public class FragmentChannel extends Fragment {
 
         // 初始化标签
         mSelectedTabIndex = 0;
+        mModeChangeAnimation = false;
+        String currentChannelName = getArguments().getString("name");
+        mChannelNameView.setText(currentChannelName);
 
         return rootView;
     }
@@ -246,12 +257,7 @@ public class FragmentChannel extends Fragment {
         }
         @Override
         protected Boolean doInBackground(Void... voids) {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return true;
+            return ProgramMgr.getInstance().getProgramList(getActivity(), "141");
         }
         @Override
         protected void onPostExecute(Boolean result) {

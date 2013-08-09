@@ -1,9 +1,9 @@
 <resources>
     <color name="white">#ffffff</color>
-    <color name="dark_yellow">#ffad8000</color>
-    <color name="orange">#ffff8c02</color>
+    <color name="orange">#ffff9202</color>
+    <color name="dark_orange">#ffff5e00</color>
     <!--<color name="red">#ffff0000</color>-->
-    <color name="red">#ffc31110</color>
+    <color name="red">#ffff1700</color>
     <color name="light_red">#ffbb4e51</color>
     <color name="light_light_red">#ffdba7a8</color>
     <color name="yellow_green">#ffaccd77</color>
