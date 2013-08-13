@@ -3,7 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/item_frame"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="105dp"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:paddingLeft="10dp"
@@ -12,10 +12,13 @@
     <!--节目海报-->
     <ImageView
             android:id="@+id/program_img"
-            android:layout_width="60dp"
-            android:layout_height="90dp"
+            android:layout_width="65dp"
+            android:layout_height="87dp"
             android:layout_centerVertical="true"
-            android:src="@color/dark_gray"/>
+            android:src="@drawable/default_image_bg_small"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:background="@drawable/pic_poser_background"/>
     <!--节目信息-->
     <LinearLayout
             android:layout_width="wrap_content"

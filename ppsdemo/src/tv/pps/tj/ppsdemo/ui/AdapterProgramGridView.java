@@ -13,6 +13,7 @@ import com.xengine.android.data.cache.DefaultDataRepo;
 import com.xengine.android.data.cache.XDataChangeListener;
 import com.xengine.android.media.image.loader.XScrollRemoteLoader;
 import com.xengine.android.media.image.processor.XImageProcessor;
+import com.xengine.android.utils.XLog;
 import tv.pps.tj.ppsdemo.R;
 import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
 import tv.pps.tj.ppsdemo.data.cache.SourceName;
@@ -30,6 +31,7 @@ import java.util.List;
  */
 public class AdapterProgramGridView extends BaseAdapter
         implements AbsListView.OnScrollListener, XDataChangeListener<ProgramBase> {
+    private static final String TAG = AdapterProgramGridView.class.getSimpleName();
 
     private Context mContext;
     private ProgramBaseSource mProgramBaseSource;
@@ -41,6 +43,7 @@ public class AdapterProgramGridView extends BaseAdapter
         mProgramBaseSource = (ProgramBaseSource) DefaultDataRepo.
                 getInstance().getSource(SourceName.PROGRAM_BASE);
         mImageScrollLoader = MyImageScrollRemoteLoader.getInstance();
+        mImageScrollLoader.setWorking();
     }
 
     @Override
@@ -67,7 +70,7 @@ public class AdapterProgramGridView extends BaseAdapter
     @Override
     public View getView(int i, View convertView, ViewGroup viewGroup) {
         ViewHolder holder = null;
-        if(convertView == null) {
+        if (convertView == null) {
             convertView = View.inflate(mContext, R.layout.program_gridview_item, null);
             holder = new ViewHolder();
             holder.frame = convertView.findViewById(R.id.item_frame);
@@ -75,7 +78,7 @@ public class AdapterProgramGridView extends BaseAdapter
             holder.programRankView = (ImageView) convertView.findViewById(R.id.program_rank);
             holder.programNameView = (TextView) convertView.findViewById(R.id.program_name);
             convertView.setTag(holder);
-        }else {
+        } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
@@ -98,6 +101,7 @@ public class AdapterProgramGridView extends BaseAdapter
                 break;
         }
         holder.programNameView.setText(programBase.getName());
+        XLog.d(TAG, "getView() asyncoLoadBitmap. index=" + i);
         // 异步加载图片
         mImageScrollLoader.asyncLoadBitmap(mContext, programBase.getPosterUrl(),
                 holder.programImageView, XImageProcessor.ImageSize.SCREEN, null);
@@ -109,13 +113,16 @@ public class AdapterProgramGridView extends BaseAdapter
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         switch (scrollState) {
             case AbsListView.OnScrollListener.SCROLL_STATE_FLING:
+                XLog.d(TAG, "SCROLL_STATE_FLING");
                 mImageScrollLoader.onScroll();
                 break;
             case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
+                XLog.d(TAG, "SCROLL_STATE_FLING");
                 mImageScrollLoader.onIdle();
                 break;
             case AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-                mImageScrollLoader.onScroll();
+                XLog.d(TAG, "SCROLL_STATE_FLING");
+                mImageScrollLoader.onIdle();// 手指触摸滑动时也加载
                 break;
 
             default:
@@ -161,6 +168,8 @@ public class AdapterProgramGridView extends BaseAdapter
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == 0) {
+                XLog.d(TAG, "postNotifyDataChange received");
+                mImageScrollLoader.onIdle();
                 notifyDataSetChanged();
             }
         }

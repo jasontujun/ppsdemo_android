@@ -1,6 +1,6 @@
 package tv.pps.tj.ppsdemo.data.cache;
 
-import com.xengine.android.data.cache.XBaseAdapterIdDataSource;
+import com.xengine.android.data.cache.XBaseFilteredAdapterIdSource;
 import tv.pps.tj.ppsdemo.data.model.ProgramBase;
 
 /**
@@ -10,7 +10,7 @@ import tv.pps.tj.ppsdemo.data.model.ProgramBase;
  * Time: 下午2:20
  * To change this template use File | Settings | File Templates.
  */
-public class ProgramBaseSource extends XBaseAdapterIdDataSource<ProgramBase> {
+public class ProgramBaseSource extends XBaseFilteredAdapterIdSource<ProgramBase> {
     @Override
     public String getSourceName() {
         return SourceName.PROGRAM_BASE;

@@ -1,6 +1,7 @@
 package tv.pps.tj.ppsdemo.ui;
 
 import android.app.Activity;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,10 +11,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.xengine.android.data.cache.DefaultDataRepo;
+import com.xengine.android.data.cache.filter.XBaseFilter;
+import com.xengine.android.media.graphics.XScreen;
+import com.xengine.android.utils.XLog;
 import com.xengine.android.utils.XStringUtil;
 import tv.pps.tj.ppsdemo.R;
+import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
+import tv.pps.tj.ppsdemo.data.cache.SourceName;
+import tv.pps.tj.ppsdemo.data.model.ProgramBase;
+import tv.pps.tj.ppsdemo.engine.ScreenHolder;
 import tv.pps.tj.ppsdemo.logic.ProgramMgr;
 import tv.pps.tj.ppsdemo.ui.animation.Rotate3dAnimationHelper;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 显示某频道下各个节目的界面.
@@ -24,15 +38,19 @@ import tv.pps.tj.ppsdemo.ui.animation.Rotate3dAnimationHelper;
  * To change this template use File | Settings | File Templates.
  */
 public class FragmentChannel extends Fragment {
+    private static final String TAG = "Channel";
 
     public static final int MODE_LISTVIEW = 0;// 列表模式
     public static final int MODE_GRIDVIEW = 1;// 网格模式
+
+    private ProgramBaseSource mProgramBaseSource;
 
     private ImageView mMenuBtn;
     private View.OnClickListener mMenuBtnListener;
     private TextView mChannelNameView;
     private ImageView  mModeBtn;
     private Button mFilterBtn;
+    private PopupWindow mFilterPopup;// 选择过滤条件的PopupWindow
     private EditText mSearchInput;
     private Button mClearInputBtn;
     private TextView mTabView1, mTabView2, mTabView3, mTabView4;
@@ -54,12 +72,15 @@ public class FragmentChannel extends Fragment {
 
     private int mCurrentMode;//当前显示模式
     private int mSelectedTabIndex;// 选中的标签页码
-    private String mFilterType, mFilterYear, mFilterFirstLetter;
+    private ProgramBaseFilter mFilter;// 过滤器
+    private int mFilterPopupSelectedIndex;// 过滤弹出框中选中的标签页码
 
-    private LoadAllTask mLoadAllTask;
+    private LoadAllTask mLoadAllTask;// 加载数据的异步线程
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mProgramBaseSource = (ProgramBaseSource) DefaultDataRepo.getInstance().getSource(SourceName.PROGRAM_BASE);
+
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.channel_frame, container, false);
         mMenuBtn = (ImageView) rootView.findViewById(R.id.menu_btn);
         mModeBtn = (ImageView) rootView.findViewById(R.id.mode_btn);
@@ -97,13 +118,49 @@ public class FragmentChannel extends Fragment {
         mFilterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO 弹出过滤对话框
+                showFilterPopupWindow();
             }
         });
         mClearInputBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mSearchInput.setText("");
+            }
+        });
+        mTabView1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSelectedTabIndex == 0)
+                    return;
+                mSelectedTabIndex = 0;
+                refreshTabAndView();
+            }
+        });
+        mTabView2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSelectedTabIndex == 1)
+                    return;
+                mSelectedTabIndex = 1;
+                refreshTabAndView();
+            }
+        });
+        mTabView3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSelectedTabIndex == 2)
+                    return;
+                mSelectedTabIndex = 2;
+                refreshTabAndView();
+            }
+        });
+        mTabView4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mSelectedTabIndex == 3)
+                    return;
+                mSelectedTabIndex = 3;
+                refreshTabAndView();
             }
         });
 
@@ -118,9 +175,10 @@ public class FragmentChannel extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 String s = mSearchInput.getText().toString();
+                mFilter.setInput(s);
+                mProgramBaseSource.doFilter();
                 if (!XStringUtil.isNullOrEmpty(s)) {
                     mClearInputBtn.setVisibility(View.VISIBLE);
-                    // TODO 根据输入字符串获取最新的列表
                 } else {
                     mClearInputBtn.setVisibility(View.GONE);
                 }
@@ -156,6 +214,12 @@ public class FragmentChannel extends Fragment {
         mProgramGridViewAdapter = new AdapterProgramGridView(getActivity());
         mProgramGridView.setAdapter(mProgramGridViewAdapter);
         mProgramGridView.setOnScrollListener(mProgramGridViewAdapter);
+        // 注册列表对数据源的监听
+        mProgramBaseSource.registerDataChangeListener(mProgramListViewAdapter);
+        mProgramBaseSource.registerDataChangeListener(mProgramGridViewAdapter);
+        // 初始化过滤器
+        mFilter = new ProgramBaseFilter();
+        mProgramBaseSource.setFilter(mFilter);
 
         // 初始化显示模式(上次用户是列表模式还是网格模式)
         mCurrentMode = getArguments().getInt("mode");// TODO 传进来的参数
@@ -169,7 +233,9 @@ public class FragmentChannel extends Fragment {
 
         // 初始化标签
         mSelectedTabIndex = 0;
+        // 初始化动画
         mModeChangeAnimation = false;
+        // 初始化标题
         String currentChannelName = getArguments().getString("name");
         mChannelNameView.setText(currentChannelName);
 
@@ -189,8 +255,6 @@ public class FragmentChannel extends Fragment {
     public void onStart() {
         super.onStart();
 
-        refreshFilterFrame();
-
         if (mLoadAllTask != null) {
             mLoadAllTask.cancel(true);
             mLoadAllTask = null;
@@ -199,31 +263,220 @@ public class FragmentChannel extends Fragment {
         mLoadAllTask.execute(null);
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (mFilterPopup != null)
+            mFilterPopup.dismiss();
+
+        if (mLoadAllTask != null) {
+            mLoadAllTask.cancel(true);
+            mLoadAllTask = null;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // 注册列表对数据源的监听
+        mProgramBaseSource.unregisterDataChangeListener(mProgramListViewAdapter);
+        mProgramBaseSource.unregisterDataChangeListener(mProgramGridViewAdapter);
+    }
 
     /**
-     * 刷新过滤栏
+     * 初始化FilterPopupWindow
+     */
+    private void showFilterPopupWindow() {
+        if (mFilterPopup == null) {
+            View contentView =View.inflate(getActivity(), R.layout.program_filter_popup, null);
+            XScreen screen = ScreenHolder.getInstance();
+            int popupWidth = screen.dp2px(160);
+            int popupHeight = screen.getScreenHeight() - screen.dp2px(120);
+            XLog.d(TAG, "screenHeight:" + screen.getScreenHeight()
+                    + ", popupHeight:" + popupHeight);
+            mFilterPopup = new PopupWindow(contentView, popupWidth, popupHeight);
+
+            // type数据
+            final String KEY = "key";
+            String[] types = getActivity().getResources().getStringArray(R.array.filter_type);
+            final ArrayList<Map<String, String>> typeItems = new ArrayList<Map<String, String>>();
+            for (int i = 0; i < types.length; i++) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put(KEY, types[i]);
+                typeItems.add(map);
+            }
+            // year数据
+            int year = Calendar.getInstance().get(Calendar.YEAR);
+            int yearSize = year - 2000 + 3;
+            final ArrayList<Map<String, String>> yearItems = new ArrayList<Map<String, String>>();
+            for (int i = 0; i < yearSize - 2; i++) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put(KEY, "" + (year - i));
+                yearItems.add(map);
+            }
+            Map<String, String> map90 = new HashMap<String, String>();
+            map90.put(KEY, "90年代");
+            yearItems.add(map90);
+            Map<String, String> map80 = new HashMap<String, String>();
+            map80.put(KEY, "80年代");
+            yearItems.add(map80);
+            // letter数据
+            char letterA = 'A';
+            final ArrayList<Map<String, String>> letterItems = new ArrayList<Map<String, String>>();
+            for (int i = 0; i < 26; i++) {
+                Map<String, String> map = new HashMap<String, String>();
+                char letter = (char) (letterA + i);
+                map.put(KEY, "" + letter);
+                letterItems.add(map);
+            }
+            Map<String, String> mapNumber = new HashMap<String, String>();
+            mapNumber.put(KEY, "数字");
+            letterItems.add(mapNumber);
+
+            // 布局
+            final TextView tab1 = (TextView) contentView.findViewById(R.id.filter_tab1);
+            final TextView tab2 = (TextView) contentView.findViewById(R.id.filter_tab2);
+            final TextView tab3 = (TextView) contentView.findViewById(R.id.filter_tab3);
+            final ListView itemList = (ListView) contentView.findViewById(R.id.filter_list);
+            final SimpleAdapter adapter1 = new SimpleAdapter(getActivity(), typeItems,
+                    R.layout.program_filter_popup_item, new String[] { KEY },
+                    new int[] { R.id.filter_txt });
+            final SimpleAdapter adapter2 = new SimpleAdapter(getActivity(), yearItems,
+                    R.layout.program_filter_popup_item, new String[] { KEY },
+                    new int[] { R.id.filter_txt });
+            final SimpleAdapter adapter3 = new SimpleAdapter(getActivity(), letterItems,
+                    R.layout.program_filter_popup_item, new String[] { KEY },
+                    new int[] { R.id.filter_txt });
+            itemList.setAdapter(adapter1);
+            itemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    switch (mFilterPopupSelectedIndex) {
+                        case 0:
+                            mFilter.setFilterType(typeItems.get(i).get(KEY));
+                            mProgramBaseSource.doFilter();
+                            refreshFilterFrame();
+                            break;
+                        case 1:
+                            mFilter.setFilterYear(yearItems.get(i).get(KEY));
+                            mProgramBaseSource.doFilter();
+                            refreshFilterFrame();
+                            break;
+                        case 2:
+                            mFilter.setFilterFirstLetter(letterItems.get(i).get(KEY));
+                            mProgramBaseSource.doFilter();
+                            refreshFilterFrame();
+                            break;
+                    }
+                }
+            });
+            tab1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mFilterPopupSelectedIndex == 0)
+                        return;
+                    mFilterPopupSelectedIndex = 0;
+                    itemList.setAdapter(adapter1);
+                    tab1.setBackgroundResource(R.drawable.area_arrows);
+                    tab2.setBackgroundResource(R.drawable.area_ohters);
+                    tab3.setBackgroundResource(R.drawable.area_ohters);
+                }
+            });
+            tab2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mFilterPopupSelectedIndex == 1)
+                        return;
+                    mFilterPopupSelectedIndex = 1;
+                    itemList.setAdapter(adapter2);
+                    tab1.setBackgroundResource(R.drawable.area_ohters);
+                    tab2.setBackgroundResource(R.drawable.area_arrows);
+                    tab3.setBackgroundResource(R.drawable.area_ohters);
+                }
+            });
+            tab3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mFilterPopupSelectedIndex == 2)
+                        return;
+                    mFilterPopupSelectedIndex = 2;
+                    itemList.setAdapter(adapter3);
+                    tab1.setBackgroundResource(R.drawable.area_ohters);
+                    tab2.setBackgroundResource(R.drawable.area_ohters);
+                    tab3.setBackgroundResource(R.drawable.area_arrows);
+                }
+            });
+            mFilterPopupSelectedIndex = 0;
+        }
+
+        mFilterPopup.setFocusable(true);
+        mFilterPopup.setBackgroundDrawable(new BitmapDrawable());// KEY!!
+        mFilterPopup.showAsDropDown(mFilterBtn);
+        mFilterPopup.update();
+    }
+
+    /**
+     * 刷新标签栏，以及对应的ListView或GridView
+     */
+    private void refreshTabAndView() {
+        XLog.d(TAG, "refreshTabAndView");
+        mTabView1.setTextColor(getActivity().getResources().getColor(R.color.black));
+        mTabView2.setTextColor(getActivity().getResources().getColor(R.color.black));
+        mTabView3.setTextColor(getActivity().getResources().getColor(R.color.black));
+        mTabView4.setTextColor(getActivity().getResources().getColor(R.color.black));
+        switch (mSelectedTabIndex) {
+            case 0:
+                XLog.d(TAG, "mProgramBaseSource sort. tab=0");
+                mProgramBaseSource.sort(ProgramBase.getHotComparator());
+                mTabView1.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                break;
+            case 1:
+                XLog.d(TAG, "mProgramBaseSource sort. tab=1");
+                mProgramBaseSource.sort(ProgramBase.getTimeComparator());
+                mTabView2.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                break;
+            case 2:
+                XLog.d(TAG, "mProgramBaseSource sort. tab=2");
+                mProgramBaseSource.sort(ProgramBase.getScoreComparator());
+                mTabView3.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                break;
+            case 3:
+                XLog.d(TAG, "mProgramBaseSource sort. tab=3");
+                mProgramBaseSource.sort(ProgramBase.getLetterComparator());
+                mTabView4.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 刷新过滤条件栏
      */
     private void refreshFilterFrame() {
-        if (XStringUtil.isNullOrEmpty(mFilterType) &&
-                XStringUtil.isNullOrEmpty(mFilterYear) &&
-                XStringUtil.isNullOrEmpty(mFilterFirstLetter))
+        if (XStringUtil.isNullOrEmpty(mFilter.getFilterType()) &&
+                XStringUtil.isNullOrEmpty(mFilter.getFilterYear()) &&
+                XStringUtil.isNullOrEmpty(mFilter.getFilterFirstLetter())) {
             mFilterFrame.setVisibility(View.GONE);
-        else {
+            mFilterBtn.setBackgroundResource(R.drawable.bkg_title_words);
+        } else {
             mFilterFrame.removeAllViews();
-            if (!XStringUtil.isNullOrEmpty(mFilterType))
-                addItemToFilterFrame(0, mFilterType);
-            if (!XStringUtil.isNullOrEmpty(mFilterYear))
-                addItemToFilterFrame(1, mFilterYear);
-            if (!XStringUtil.isNullOrEmpty(mFilterFirstLetter))
-                addItemToFilterFrame(2, mFilterFirstLetter);
+            if (!XStringUtil.isNullOrEmpty(mFilter.getFilterType()))
+                addItemToFilterFrame(0, mFilter.getFilterType());
+            if (!XStringUtil.isNullOrEmpty(mFilter.getFilterYear()))
+                addItemToFilterFrame(1, mFilter.getFilterYear());
+            if (!XStringUtil.isNullOrEmpty(mFilter.getFilterFirstLetter()))
+                addItemToFilterFrame(2, mFilter.getFilterFirstLetter());
             mFilterFrame.setVisibility(View.VISIBLE);
+            mFilterBtn.setBackgroundResource(R.drawable.bkg_title_words_red);
         }
     }
 
     private void addItemToFilterFrame(final int type, String filterStr) {
-        View rootView = View.inflate(getActivity(), R.layout.filter_item, null);
+        View rootView = View.inflate(getActivity(), R.layout.program_filter_label_item, null);
         TextView filterTxt = (TextView) rootView.findViewById(R.id.item_txt);
-        ImageView closeBtn = (ImageView) rootView.findViewById(R.id.close_btn);
         filterTxt.setText(filterStr);
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -231,26 +484,37 @@ public class FragmentChannel extends Fragment {
                 // 删除filter item
                 switch (type) {
                     case 0:
-                        mFilterType = null;
+                        mFilter.setFilterType(null);
+                        mProgramBaseSource.doFilter();
                         break;
                     case 1:
-                        mFilterYear = null;
+                        mFilter.setFilterYear(null);
+                        mProgramBaseSource.doFilter();
                         break;
                     case 2:
-                        mFilterFirstLetter = null;
+                        mFilter.setFilterFirstLetter(null);
+                        mProgramBaseSource.doFilter();
                         break;
                 }
                 refreshFilterFrame();
             }
         });
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.FILL_PARENT);
+        mFilterFrame.addView(rootView, params);
     }
 
+    /**
+     * 加载列表数据的asyncTask
+     */
     private class LoadAllTask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
             mAllLoadingProgressBar.setIndeterminate(true);
             mAllLoadingTextView.setText("正在加载...");
+            mAllLoadingProgressBar.setVisibility(View.VISIBLE);
             mAllLoadingFrame.setVisibility(View.VISIBLE);
             mModeBtn.setVisibility(View.GONE);
             mFilterBtn.setVisibility(View.GONE);
@@ -265,11 +529,87 @@ public class FragmentChannel extends Fragment {
                 mAllLoadingFrame.setVisibility(View.GONE);
                 mModeBtn.setVisibility(View.VISIBLE);
                 mFilterBtn.setVisibility(View.VISIBLE);
-                // TODO 更新界面
+                // 更新界面
+                refreshTabAndView();
+                refreshFilterFrame();
             } else {
                 mAllLoadingProgressBar.setVisibility(View.GONE);
                 mAllLoadingTextView.setText("网络异常，无法加载内容...");
             }
+        }
+        @Override
+        protected void onCancelled(){
+            mAllLoadingProgressBar.setVisibility(View.GONE);
+            mAllLoadingTextView.setText("网络异常，无法加载内容...");
+        }
+    }
+
+    /**
+     * 对于ProgramBase数据源的过滤器
+     */
+    private class ProgramBaseFilter extends XBaseFilter<ProgramBase> {
+        private String mInput;// 用户输入
+        private String mFilterType, mFilterYear, mFilterFirstLetter;// 过滤的条件
+
+        private String getInput() {
+            return mInput;
+        }
+
+        private void setInput(String input) {
+            this.mInput = input;
+        }
+
+        private String getFilterType() {
+            return mFilterType;
+        }
+
+        private void setFilterType(String filterType) {
+            this.mFilterType = filterType;
+        }
+
+        private String getFilterYear() {
+            return mFilterYear;
+        }
+
+        private void setFilterYear(String filterYear) {
+            this.mFilterYear = filterYear;
+        }
+
+        private String getFilterFirstLetter() {
+            return mFilterFirstLetter;
+        }
+
+        private void setFilterFirstLetter(String filterFirstLetter) {
+            this.mFilterFirstLetter = filterFirstLetter;
+        }
+
+        @Override
+        public ProgramBase doFilter(ProgramBase programBase) {
+            if (!XStringUtil.isNullOrEmpty(mInput)) {
+                if (!programBase.getName().contains(mInput))
+                    return null;
+            }
+            if (!XStringUtil.isNullOrEmpty(mFilterType)) {
+                String programType = programBase.getSearchProgramType();
+                if (XStringUtil.isNullOrEmpty(programType)) // 如果没有searchType，则用type属性
+                    programType = programBase.getType();
+                if (XStringUtil.isNullOrEmpty(programType))
+                    return null;
+                if (!programType.contains(mFilterType))
+                    return null;
+            }
+            if (!XStringUtil.isNullOrEmpty(mFilterYear)) {
+                String programYear = programBase.getSearchProgramYear();
+                if (XStringUtil.isNullOrEmpty(programYear))
+                    return null;
+                if (!programYear.equals(mFilterYear))
+                    return null;
+            }
+            if (!XStringUtil.isNullOrEmpty(mFilterFirstLetter)) {
+                if (!programBase.getFirstLetter().equals(mFilterFirstLetter))
+                    return null;
+            }
+            return programBase;
         }
     }
 }

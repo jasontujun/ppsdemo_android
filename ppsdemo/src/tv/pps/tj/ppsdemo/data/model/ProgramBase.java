@@ -1,5 +1,7 @@
 package tv.pps.tj.ppsdemo.data.model;
 
+import java.util.Comparator;
+
 /**
  * Created with IntelliJ IDEA.
  * User: tujun
@@ -249,5 +251,48 @@ public class ProgramBase {
 
     public void setPlatformWhiteList(String[] platformWhiteList) {
         this.platformWhiteList = platformWhiteList;
+    }
+
+
+    public static Comparator<ProgramBase> getScoreComparator() {
+        return new Comparator<ProgramBase>() {
+            @Override
+            public int compare(ProgramBase programBase, ProgramBase programBase1) {
+                if (programBase1.getVote() < programBase.getVote())
+                    return -1;
+                else if (programBase1.getVote() > programBase.getVote())
+                    return 1;
+                else
+                    return (int) (programBase1.getTime() - programBase.getTime());
+            }
+        };
+    }
+
+    public static Comparator<ProgramBase> getHotComparator() {
+        return new Comparator<ProgramBase>() {
+            @Override
+            public int compare(ProgramBase programBase, ProgramBase programBase1) {
+                return programBase1.getOnlineNumber() - programBase.getOnlineNumber();
+            }
+        };
+    }
+
+    public static Comparator<ProgramBase> getTimeComparator() {
+        return new Comparator<ProgramBase>() {
+            @Override
+            public int compare(ProgramBase programBase, ProgramBase programBase1) {
+                return (int) (programBase1.getTime() - programBase.getTime());
+            }
+        };
+    }
+
+    public static Comparator<ProgramBase> getLetterComparator() {
+        return new Comparator<ProgramBase>() {
+            @Override
+            public int compare(ProgramBase programBase, ProgramBase programBase1) {
+                return programBase.getFirstLetter().charAt(0) -
+                        programBase1.getFirstLetter().charAt(0);
+            }
+        };
     }
 }

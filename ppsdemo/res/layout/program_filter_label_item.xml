@@ -3,9 +3,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:layout_width="wrap_content"
-              android:layout_height="match_parent"
-              android:paddingLeft="6dp"
-              android:paddingRight="6dp">
+              android:layout_height="fill_parent"
+              android:paddingLeft="10dp"
+              android:paddingRight="10dp"
+              android:background="@drawable/bg_transparent_orange">
     <TextView
             android:id="@+id/item_txt"
             android:layout_width="wrap_content"

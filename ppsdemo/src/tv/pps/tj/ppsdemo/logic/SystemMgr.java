@@ -3,8 +3,6 @@ package tv.pps.tj.ppsdemo.logic;
 import android.content.Context;
 import com.xengine.android.data.cache.DefaultDataRepo;
 import com.xengine.android.data.db.XSQLiteHelper;
-import com.xengine.android.media.graphics.XAndroidScreen;
-import com.xengine.android.media.graphics.XScreen;
 import com.xengine.android.system.file.XAndroidFileMgr;
 import com.xengine.android.system.file.XFileMgr;
 import tv.pps.tj.ppsdemo.R;
@@ -42,6 +40,8 @@ public class SystemMgr {
      * @param context
      */
     public void initEngine(Context context) {
+        // 初始化屏幕
+        ScreenHolder.init(context);
         // 初始化文件管理模块
         XFileMgr fileMgr = XAndroidFileMgr.getInstance();
         fileMgr.setRootName("ppsdemo");
@@ -49,10 +49,10 @@ public class SystemMgr {
         fileMgr.setDir(XFileMgr.FILE_TYPE_PHOTO, "photo", true);
         fileMgr.setDir(DIR_DATA_XML, "data" + File.separator + "xml", false);
         // 初始化网络模块
-        XScreen screen = new XAndroidScreen(context);
         HttpClientHolder.init(context);
         DownloadMgrHolder.init(HttpClientHolder.getImageHttpClient(),
-                screen.getScreenWidth(), screen.getScreenHeight());
+                ScreenHolder.getInstance().getScreenWidth(),
+                ScreenHolder.getInstance().getScreenHeight());
         UploadMgrHolder.init(HttpClientHolder.getImageHttpClient());
         // 初始化图片加载模块
         MyImageViewLocalLoader.getInstance().init(

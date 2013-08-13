@@ -8,4 +8,21 @@
     <!--api-->
     <string name="program_list">sub/</string>
     <string name="program_detail">getgetgetdetail/</string>
+
+    <string-array name="filter_type">
+        <item>伦理</item>
+        <item>偶像</item>
+        <item>军事</item>
+        <item>励志</item>
+        <item>古装</item>
+        <item>喜剧</item>
+        <item>家庭</item>
+        <item>情景剧</item>
+        <item>战争</item>
+        <item>武侠</item>
+        <item>涉案</item>
+        <item>爱情</item>
+        <item>神话</item>
+        <item>警匪</item>
+    </string-array>
 </resources>
