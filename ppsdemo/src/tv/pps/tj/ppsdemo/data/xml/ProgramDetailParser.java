@@ -7,6 +7,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import tv.pps.tj.ppsdemo.data.model.Episode;
 import tv.pps.tj.ppsdemo.data.model.ProgramDetail;
+import tv.pps.tj.ppsdemo.data.model.ThirdPart;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,14 +33,15 @@ public class ProgramDetailParser {
      * @param is
      * @return
      */
-    public static ProgramDetail parse(InputStream is) {
+    public static boolean parse(InputStream is, ProgramDetail programDetail) {
         try {
-            ProgramDetail programDetail = null;
             List<Episode> normalEpisodeList = null;
             List<Episode> hqEpisodeList = null;
             List<Episode> trailerEpisodeList = null;
             Episode episode = null;
             boolean isThirdPart = false;
+            List<ThirdPart> thirdPartList = null;
+            ThirdPart thirdPart = null;
             Map<String, String> platformMap = null;
 
             XmlPullParser parser = Xml.newPullParser(); //由android.util.Xml创建一个XmlPullParser实例
@@ -53,7 +55,6 @@ public class ProgramDetailParser {
                     case XmlPullParser.START_TAG:
                         // 节目数据
                         if (parser.getName().equals("Sub")) {
-                            programDetail = new ProgramDetail();
                             String tm = parser.getAttributeValue(null, "tm");
                             XLog.d(TAG, "<Sub tm=" + tm);
                         } else if (parser.getName().equals("id")) {
@@ -268,21 +269,23 @@ public class ProgramDetailParser {
                         // 第三方相关信息
                         else if (parser.getName().equals("ThirdPart")) {
                             isThirdPart = true;
+                            thirdPartList = new ArrayList<ThirdPart>();
                         }
                         else if (parser.getName().equals("part")) {
+                            thirdPart = new ThirdPart();
                             String partType = parser.getAttributeValue(null, "partType");
                             XLog.d(TAG, "     partType=" + partType);
-                            programDetail.setThirdPartType(partType);
+                            thirdPart.setThirdPartType(partType);
                             String partTitle = parser.getAttributeValue(null, "partTitle");
                             XLog.d(TAG, "     partTitle=" + partTitle);
-                            programDetail.setThirdPartTitle(partTitle);
+                            thirdPart.setThirdPartTitle(partTitle);
                             String partImage = parser.getAttributeValue(null, "partImage");
                             XLog.d(TAG, "     partImage=" + partImage);
-                            programDetail.setThirdPartImage(partImage);
+                            thirdPart.setThirdPartImage(partImage);
                             String fn = parser.getAttributeValue(null, "fn");
                             XLog.d(TAG, "<fn>" + fn + "</fn>");
                             if (!XStringUtil.isNullOrEmpty(fn))
-                                programDetail.setThirdPartIsEntertainment(fn.equals("1"));
+                                thirdPart.setThirdPartIsEntertainment(fn.equals("1"));
                         }
                         // 平台列表
                         else if (parser.getName().equals("playType")) {
@@ -302,18 +305,18 @@ public class ProgramDetailParser {
                         } else if (parser.getName().equals("Channels")) {
                             if (!isThirdPart) {
                                 if (normalEpisodeList != null && normalEpisodeList.size() != 0)
-                                    programDetail.setPpsNormalEpisode(normalEpisodeList);
+                                    programDetail.setPpsNormalEpisodes(normalEpisodeList);
                                 if (hqEpisodeList != null && hqEpisodeList.size() != 0)
-                                    programDetail.setPpsHqEpisode(hqEpisodeList);
+                                    programDetail.setPpsHqEpisodes(hqEpisodeList);
                                 if (trailerEpisodeList != null && trailerEpisodeList.size() != 0)
-                                    programDetail.setPpsTrailerEpisode(trailerEpisodeList);
+                                    programDetail.setPpsTrailerEpisodes(trailerEpisodeList);
                             } else {
                                 if (normalEpisodeList != null && normalEpisodeList.size() != 0)
-                                    programDetail.setThirdPartNormalEpisode(normalEpisodeList);
+                                    thirdPart.setThirdPartNormalEpisodes(normalEpisodeList);
                                 if (hqEpisodeList != null && hqEpisodeList.size() != 0)
-                                    programDetail.setThirdPartHqEpisode(hqEpisodeList);
+                                    thirdPart.setThirdPartHqEpisodes(hqEpisodeList);
                                 if (trailerEpisodeList != null && trailerEpisodeList.size() != 0)
-                                    programDetail.setThirdPartTrailerEpisode(trailerEpisodeList);
+                                    thirdPart.setThirdPartTrailerEpisodes(trailerEpisodeList);
                             }
                             normalEpisodeList = null;
                             hqEpisodeList = null;
@@ -327,21 +330,25 @@ public class ProgramDetailParser {
                                 normalEpisodeList.add(episode);
                             episode = null;
                         } else if (parser.getName().equals("ThirdPart")) {
+                            thirdPartList = null;
                             isThirdPart = false;
-                        }  else if (parser.getName().equals("playType")) {
-                            programDetail.setPlatform(platformMap);
+                        } else if (parser.getName().equals("part")) {
+                            thirdPartList.add(thirdPart);
+                            thirdPart = null;
+                        } else if (parser.getName().equals("playType")) {
+                            thirdPart.setPlatform(platformMap);
                             platformMap = null;
                         }
                         break;
                 }
                 eventType = parser.next();
             }
-            return programDetail;
+            return true;
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
 }

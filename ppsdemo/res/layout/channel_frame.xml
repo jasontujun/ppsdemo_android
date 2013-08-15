@@ -211,28 +211,5 @@
                 android:layout_height="fill_parent"
                 android:divider="@drawable/list_line_gray"
                 android:dividerHeight="0.5dp"/>
-        <!--loading-->
-        <LinearLayout
-                android:id="@+id/list_loading_frame"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:orientation="horizontal"
-                android:visibility="gone">
-            <ProgressBar
-                    style="?android:progressBarStyleSmall"
-                    android:id="@+id/list_loading_progressbar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminateDrawable="@drawable/progressbar_small"/>                   />
-            <TextView
-                    android:id="@+id/list_loading_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="正在加载..."
-                    android:textSize="15sp"
-                    android:textColor="@color/dark_gray"/>
-        </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

@@ -25,6 +25,8 @@ public class ActivityMain extends FragmentActivity {
 
     private ViewPager mDragMenu;// 可拖动图层
     private PagerAdapter mDragMenuAdapter;
+    private Fragment mLeftMenuFragment;// 左边菜单栏
+    private FragmentContainer mMiddleContainerFragment;// 中间主界面
 
     private boolean mShowingMenu;// 是否显示左边栏
 
@@ -39,6 +41,9 @@ public class ActivityMain extends FragmentActivity {
         // ui
         setContentView(R.layout.base_activity_frame);
         mDragMenu = (ViewPager) findViewById(R.id.drag_frame);
+
+        mLeftMenuFragment = new FragmentLeftMenu();
+        mMiddleContainerFragment = new FragmentContainer();
         mDragMenuAdapter = new DragMenuAdapter(getSupportFragmentManager());
         mDragMenu.setAdapter(mDragMenuAdapter);
         mDragMenu.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -75,11 +80,22 @@ public class ActivityMain extends FragmentActivity {
         return new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mMiddleContainerFragment.selectMenu(i);
+
                 // TODO 切换成相应的Fragment界面
                 if (mShowingMenu)
                     mDragMenu.setCurrentItem(1);
             }
         };
+    }
+
+
+    /**
+     * 当前主题页面下添加页面
+     * @param fragment
+     */
+    public void addFragment(Fragment fragment) {
+        mMiddleContainerFragment.addFragment(fragment);
     }
 
 
@@ -90,20 +106,10 @@ public class ActivityMain extends FragmentActivity {
 
         private static final int NUM_PAGES = 2;
 
-        private Fragment mLeftMenuFragment;
-        private Fragment mMiddleContentFragment;
-
-        private float mLeftMenuWidthProportion;
+        private float mLeftMenuWidthProportion;// 左边栏宽度比例
 
         public DragMenuAdapter(FragmentManager fm) {
             super(fm);
-            mLeftMenuFragment = new FragmentLeftMenu();
-            mMiddleContentFragment = new FragmentChannel();
-            Bundle args = new Bundle();
-            args.putInt("mode", FragmentChannel.MODE_LISTVIEW);
-            args.putString("name", "内地剧场");
-            mMiddleContentFragment.setArguments(args);
-
             // 计算左边栏的宽度比例
             XScreen screen = new XAndroidScreen(ActivityMain.this);
             float sWidthPx = screen.getScreenWidth();// 单位：像素
@@ -116,7 +122,7 @@ public class ActivityMain extends FragmentActivity {
             if (position == 0)
                 return mLeftMenuFragment;
             else
-                return mMiddleContentFragment;
+                return mMiddleContainerFragment;
         }
 
         @Override

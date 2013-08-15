@@ -9,6 +9,7 @@ import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
 import tv.pps.tj.ppsdemo.data.cache.ProgramDetailSource;
 import tv.pps.tj.ppsdemo.data.cache.SourceName;
 import tv.pps.tj.ppsdemo.data.model.ProgramBase;
+import tv.pps.tj.ppsdemo.data.model.ProgramDetail;
 import tv.pps.tj.ppsdemo.data.xml.ProgramListParser;
 import tv.pps.tj.ppsdemo.session.StatusCode;
 import tv.pps.tj.ppsdemo.session.api.ProgramAPI;
@@ -55,26 +56,34 @@ public class ProgramMgr {
 
     /**
      * 获取节目列表
+     * @param context
      * @param channelId
      * @return
      */
     public boolean getProgramList(Context context, String channelId) {
         List<ProgramBase> programBaseList = null;
         boolean result = false;
-        // 如果更新时间小于REFRESH_INTERVAL，且xml文件存在，则重新解析上次下载的xml文件
+        // 如果更新时间小于REFRESH_INTERVAL，加载本地数据
         long programListTimeStamp = mGlobalStateSource.getProgramListXmlUpdateTimeStamp();
         String programListXmlFileName = mGlobalStateSource.getProgramListXmlFileName();
         if (System.currentTimeMillis() - programListTimeStamp < REFRESH_INTERVAL
                 && !XStringUtil.isNullOrEmpty(programListXmlFileName)) {
-            File xmlDir = XAndroidFileMgr.getInstance().getDir(SystemMgr.DIR_DATA_XML);
-            File xmlFile = new File(xmlDir, programListXmlFileName);
-            if (xmlFile.exists()) {
-                try {
-                    programBaseList = ProgramListParser.parse(new FileInputStream(xmlFile));
-                    result = programBaseList != null;
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    return false;
+            // 如果内存数据源中有数据，则返回数据源的数据
+            if (mProgramBaseSource.size() != 0) {
+                return true;
+            }
+            // 如果数据源数据为空，且xml文件存在，则重新解析上次下载的xml文件
+            else {
+                File xmlDir = XAndroidFileMgr.getInstance().getDir(SystemMgr.DIR_DATA_XML);
+                File xmlFile = new File(xmlDir, programListXmlFileName);
+                if (xmlFile.exists()) {
+                    try {
+                        programBaseList = ProgramListParser.parse(new FileInputStream(xmlFile));
+                        result = (programBaseList != null);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        return false;
+                    }
                 }
             }
         }
@@ -100,10 +109,22 @@ public class ProgramMgr {
 
     /**
      * 获取节目详情
+     * @param context
      * @param programId
      * @return
      */
-    public boolean getProgramDetail(String programId) {
-        return false;
+    public ProgramDetail getProgramDetail(Context context, String programId) {
+        // 先从内存中获取
+        ProgramDetail programDetail = mProgramDetailSource.getById(programId);
+        // 如果没有，则从远程获取信息
+        if (programDetail == null) {
+            programDetail = new ProgramDetail();
+            int resultCode = new ProgramAPI(context).getProgramDetail(programDetail, programId);
+            if (StatusCode.isSuccess(resultCode))
+                mProgramDetailSource.add(programDetail);
+            else
+                return null;
+        }
+        return programDetail;
     }
 }

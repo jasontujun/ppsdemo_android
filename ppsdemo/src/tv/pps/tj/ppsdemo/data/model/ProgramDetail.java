@@ -1,7 +1,6 @@
 package tv.pps.tj.ppsdemo.data.model;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,7 +10,6 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class ProgramDetail {
-
     private String id;// 影片id -id
     private String bkId;// 影片百科id -bkid
     private String name;// 影片名称 -name
@@ -38,20 +36,13 @@ public class ProgramDetail {
     private String[] blackList;// 黑名单 -block
     private String[] whiteList;// 白名单 -wlock
 
-    /** 第三方相关属性 **/
-    private String thirdPartType; // 第三方视频的id值 -partType
-    private String thirdPartTitle; // 第三方视频的名称 -partTitle
-    private String thirdPartImage; // 第三方视频的图标 -partImage
-    private boolean thirdPartIsEntertainment;// 综艺和新闻才有值 - fn
-    private Map<String, String> platform;// 当前支持的平台和播放方式：如启动系统播放器 -type
-
     /** 集数相关属性 **/
-    private List<Episode> ppsNormalEpisode;
-    private List<Episode> ppsHqEpisode;
-    private List<Episode> ppsTrailerEpisode;
-    private List<Episode> thirdPartNormalEpisode;
-    private List<Episode> thirdPartHqEpisode;
-    private List<Episode> thirdPartTrailerEpisode;
+    private List<Episode> ppsNormalEpisodes;
+    private List<Episode> ppsHqEpisodes;
+    private List<Episode> ppsTrailerEpisodes;
+
+    /** 第三方相关 **/
+    private List<ThirdPart> thirdPartList;
 
     public String getId() {
         return id;
@@ -221,91 +212,35 @@ public class ProgramDetail {
         this.whiteList = whiteList;
     }
 
-    public String getThirdPartType() {
-        return thirdPartType;
+    public List<Episode> getPpsNormalEpisodes() {
+        return ppsNormalEpisodes;
     }
 
-    public void setThirdPartType(String thirdPartType) {
-        this.thirdPartType = thirdPartType;
+    public void setPpsNormalEpisodes(List<Episode> ppsNormalEpisodes) {
+        this.ppsNormalEpisodes = ppsNormalEpisodes;
     }
 
-    public String getThirdPartTitle() {
-        return thirdPartTitle;
+    public List<Episode> getPpsHqEpisodes() {
+        return ppsHqEpisodes;
     }
 
-    public void setThirdPartTitle(String thirdPartTitle) {
-        this.thirdPartTitle = thirdPartTitle;
+    public void setPpsHqEpisodes(List<Episode> ppsHqEpisodes) {
+        this.ppsHqEpisodes = ppsHqEpisodes;
     }
 
-    public String getThirdPartImage() {
-        return thirdPartImage;
+    public List<Episode> getPpsTrailerEpisodes() {
+        return ppsTrailerEpisodes;
     }
 
-    public void setThirdPartImage(String thirdPartImage) {
-        this.thirdPartImage = thirdPartImage;
+    public void setPpsTrailerEpisodes(List<Episode> ppsTrailerEpisodes) {
+        this.ppsTrailerEpisodes = ppsTrailerEpisodes;
     }
 
-    public boolean isThirdPartIsEntertainment() {
-        return thirdPartIsEntertainment;
+    public List<ThirdPart> getThirdPartList() {
+        return thirdPartList;
     }
 
-    public void setThirdPartIsEntertainment(boolean thirdPartIsEntertainment) {
-        this.thirdPartIsEntertainment = thirdPartIsEntertainment;
-    }
-
-    public Map<String, String> getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(Map<String, String> platform) {
-        this.platform = platform;
-    }
-
-    public List<Episode> getPpsNormalEpisode() {
-        return ppsNormalEpisode;
-    }
-
-    public void setPpsNormalEpisode(List<Episode> ppsNormalEpisode) {
-        this.ppsNormalEpisode = ppsNormalEpisode;
-    }
-
-    public List<Episode> getPpsHqEpisode() {
-        return ppsHqEpisode;
-    }
-
-    public void setPpsHqEpisode(List<Episode> ppsHqEpisode) {
-        this.ppsHqEpisode = ppsHqEpisode;
-    }
-
-    public List<Episode> getPpsTrailerEpisode() {
-        return ppsTrailerEpisode;
-    }
-
-    public void setPpsTrailerEpisode(List<Episode> ppsTrailerEpisode) {
-        this.ppsTrailerEpisode = ppsTrailerEpisode;
-    }
-
-    public List<Episode> getThirdPartNormalEpisode() {
-        return thirdPartNormalEpisode;
-    }
-
-    public void setThirdPartNormalEpisode(List<Episode> thirdPartNormalEpisode) {
-        this.thirdPartNormalEpisode = thirdPartNormalEpisode;
-    }
-
-    public List<Episode> getThirdPartHqEpisode() {
-        return thirdPartHqEpisode;
-    }
-
-    public void setThirdPartHqEpisode(List<Episode> thirdPartHqEpisode) {
-        this.thirdPartHqEpisode = thirdPartHqEpisode;
-    }
-
-    public List<Episode> getThirdPartTrailerEpisode() {
-        return thirdPartTrailerEpisode;
-    }
-
-    public void setThirdPartTrailerEpisode(List<Episode> thirdPartTrailerEpisode) {
-        this.thirdPartTrailerEpisode = thirdPartTrailerEpisode;
+    public void setThirdPartList(List<ThirdPart> thirdPartList) {
+        this.thirdPartList = thirdPartList;
     }
 }

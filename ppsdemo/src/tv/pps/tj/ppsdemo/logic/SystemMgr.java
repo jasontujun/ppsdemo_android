@@ -55,13 +55,7 @@ public class SystemMgr {
                 ScreenHolder.getInstance().getScreenHeight());
         UploadMgrHolder.init(HttpClientHolder.getImageHttpClient());
         // 初始化图片加载模块
-        MyImageViewLocalLoader.getInstance().init(
-                R.drawable.default_image_bg_small,
-                R.drawable.default_image_bg_small,
-                R.drawable.default_image_bg_small,
-                R.drawable.default_image_bg_small
-        );
-        MyImageSwitcherLocalLoader.getInstance().init(
+        MyImageViewRemoteLoader.getInstance().init(
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
@@ -118,8 +112,7 @@ public class SystemMgr {
 
     public void clearSystem() {
         // clear image cache
-        MyImageViewLocalLoader.getInstance().clearImageCache();
-        MyImageSwitcherLocalLoader.getInstance().clearImageCache();
+        MyImageViewRemoteLoader.getInstance().clearImageCache();
         MyImageScrollLocalLoader.getInstance().clearImageCache();
         MyImageScrollRemoteLoader.getInstance().clearImageCache();
 

@@ -65,7 +65,6 @@ public class FragmentChannel extends Fragment {
     private View mAllLoadingFrame;// 整个节目加载提示
     private ProgressBar mAllLoadingProgressBar;
     private TextView mAllLoadingTextView;
-    private View mListLoadingFrame;// 列表加载提示
 
     private Rotate3dAnimationHelper mRotate3dAnimationHelper;
     private boolean mModeChangeAnimation = false;// 是否正在播放切换动画
@@ -100,7 +99,6 @@ public class FragmentChannel extends Fragment {
         mAllLoadingFrame = rootView.findViewById(R.id.all_loading_frame);
         mAllLoadingProgressBar = (ProgressBar) rootView.findViewById(R.id.all_loading_progressbar);
         mAllLoadingTextView = (TextView) rootView.findViewById(R.id.all_loading_txt);
-        mListLoadingFrame = rootView.findViewById(R.id.list_loading_frame);
 
         // 初始化监听
         mMenuBtn.setOnClickListener(mMenuBtnListener);  // 设置菜单按钮的监听
@@ -211,9 +209,11 @@ public class FragmentChannel extends Fragment {
         mProgramListViewAdapter = new AdapterProgramListView(getActivity());
         mProgramListView.setAdapter(mProgramListViewAdapter);
         mProgramListView.setOnScrollListener(mProgramListViewAdapter);
+        mProgramListView.setOnItemClickListener(new ProgramItemClickListener());
         mProgramGridViewAdapter = new AdapterProgramGridView(getActivity());
         mProgramGridView.setAdapter(mProgramGridViewAdapter);
         mProgramGridView.setOnScrollListener(mProgramGridViewAdapter);
+        mProgramGridView.setOnItemClickListener(new ProgramItemClickListener());
         // 注册列表对数据源的监听
         mProgramBaseSource.registerDataChangeListener(mProgramListViewAdapter);
         mProgramBaseSource.registerDataChangeListener(mProgramGridViewAdapter);
@@ -222,7 +222,7 @@ public class FragmentChannel extends Fragment {
         mProgramBaseSource.setFilter(mFilter);
 
         // 初始化显示模式(上次用户是列表模式还是网格模式)
-        mCurrentMode = getArguments().getInt("mode");// TODO 传进来的参数
+        mCurrentMode = getArguments().getInt("mode");// 传进来的参数
         if (mCurrentMode == MODE_LISTVIEW) {
             mProgramListView.setVisibility(View.VISIBLE);
             mProgramGridView.setVisibility(View.GONE);
@@ -505,6 +505,20 @@ public class FragmentChannel extends Fragment {
         mFilterFrame.addView(rootView, params);
     }
 
+    private class ProgramItemClickListener implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            ProgramBase programBase = mProgramBaseSource.get(i);
+            FragmentProgram programDetail = new FragmentProgram();
+            Bundle args = new Bundle();
+            args.putString("id", programBase.getId());
+            args.putString("name", programBase.getName());
+            programDetail.setArguments(args);
+
+            ((ActivityMain) getActivity()).addFragment(programDetail);// 跳转详情界面
+        }
+    }
+
     /**
      * 加载列表数据的asyncTask
      */
@@ -550,10 +564,6 @@ public class FragmentChannel extends Fragment {
     private class ProgramBaseFilter extends XBaseFilter<ProgramBase> {
         private String mInput;// 用户输入
         private String mFilterType, mFilterYear, mFilterFirstLetter;// 过滤的条件
-
-        private String getInput() {
-            return mInput;
-        }
 
         private void setInput(String input) {
             this.mInput = input;

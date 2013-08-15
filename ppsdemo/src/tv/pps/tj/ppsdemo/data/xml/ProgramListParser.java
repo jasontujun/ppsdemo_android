@@ -24,8 +24,6 @@ import java.util.List;
  */
 public class ProgramListParser {
 
-    private static final String TAG = ProgramListParser.class.getSimpleName();
-
     public static List<ProgramBase> parse(InputStream is) {
         try {
             GlobalStateSource globalStateSource = (GlobalStateSource) DefaultDataRepo.

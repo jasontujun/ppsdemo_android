@@ -7,7 +7,7 @@
 
     <!--api-->
     <string name="program_list">sub/</string>
-    <string name="program_detail">getgetgetdetail/</string>
+    <string name="program_detail">detail/</string>
 
     <string-array name="filter_type">
         <item>伦理</item>
