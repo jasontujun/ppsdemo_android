@@ -1,6 +1,7 @@
 package tv.pps.tj.ppsdemo.data.model;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,9 +38,7 @@ public class ProgramDetail {
     private String[] whiteList;// 白名单 -wlock
 
     /** 集数相关属性 **/
-    private List<Episode> ppsNormalEpisodes;
-    private List<Episode> ppsHqEpisodes;
-    private List<Episode> ppsTrailerEpisodes;
+    private Map<String, List<Episode>> ppsEpisodes;
 
     /** 第三方相关 **/
     private List<ThirdPart> thirdPartList;
@@ -212,28 +211,12 @@ public class ProgramDetail {
         this.whiteList = whiteList;
     }
 
-    public List<Episode> getPpsNormalEpisodes() {
-        return ppsNormalEpisodes;
+    public Map<String, List<Episode>> getPpsEpisodes() {
+        return ppsEpisodes;
     }
 
-    public void setPpsNormalEpisodes(List<Episode> ppsNormalEpisodes) {
-        this.ppsNormalEpisodes = ppsNormalEpisodes;
-    }
-
-    public List<Episode> getPpsHqEpisodes() {
-        return ppsHqEpisodes;
-    }
-
-    public void setPpsHqEpisodes(List<Episode> ppsHqEpisodes) {
-        this.ppsHqEpisodes = ppsHqEpisodes;
-    }
-
-    public List<Episode> getPpsTrailerEpisodes() {
-        return ppsTrailerEpisodes;
-    }
-
-    public void setPpsTrailerEpisodes(List<Episode> ppsTrailerEpisodes) {
-        this.ppsTrailerEpisodes = ppsTrailerEpisodes;
+    public void setPpsEpisodes(Map<String, List<Episode>> ppsEpisodes) {
+        this.ppsEpisodes = ppsEpisodes;
     }
 
     public List<ThirdPart> getThirdPartList() {

@@ -19,9 +19,7 @@ public class ThirdPart {
     private Map<String, String> platform;// 当前支持的平台和播放方式：如启动系统播放器 -type
 
     /** 集数相关属性 **/
-    private List<Episode> thirdPartNormalEpisodes;
-    private List<Episode> thirdPartHqEpisodes;
-    private List<Episode> thirdPartTrailerEpisodes;
+    private Map<String, List<Episode>> thirdPartEpisodes;
 
     public String getThirdPartType() {
         return thirdPartType;
@@ -63,27 +61,11 @@ public class ThirdPart {
         this.platform = platform;
     }
 
-    public List<Episode> getThirdPartNormalEpisodes() {
-        return thirdPartNormalEpisodes;
+    public Map<String, List<Episode>> getThirdPartEpisodes() {
+        return thirdPartEpisodes;
     }
 
-    public void setThirdPartNormalEpisodes(List<Episode> thirdPartNormalEpisodes) {
-        this.thirdPartNormalEpisodes = thirdPartNormalEpisodes;
-    }
-
-    public List<Episode> getThirdPartHqEpisodes() {
-        return thirdPartHqEpisodes;
-    }
-
-    public void setThirdPartHqEpisodes(List<Episode> thirdPartHqEpisodes) {
-        this.thirdPartHqEpisodes = thirdPartHqEpisodes;
-    }
-
-    public List<Episode> getThirdPartTrailerEpisodes() {
-        return thirdPartTrailerEpisodes;
-    }
-
-    public void setThirdPartTrailerEpisodes(List<Episode> thirdPartTrailerEpisodes) {
-        this.thirdPartTrailerEpisodes = thirdPartTrailerEpisodes;
+    public void setThirdPartEpisodes(Map<String, List<Episode>> thirdPartEpisodes) {
+        this.thirdPartEpisodes = thirdPartEpisodes;
     }
 }

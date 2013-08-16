@@ -35,9 +35,7 @@ public class ProgramDetailParser {
      */
     public static boolean parse(InputStream is, ProgramDetail programDetail) {
         try {
-            List<Episode> normalEpisodeList = null;
-            List<Episode> hqEpisodeList = null;
-            List<Episode> trailerEpisodeList = null;
+            Map<String, List<Episode>> allTypesEpisodes = null;
             Episode episode = null;
             boolean isThirdPart = false;
             List<ThirdPart> thirdPartList = null;
@@ -45,7 +43,7 @@ public class ProgramDetailParser {
             Map<String, String> platformMap = null;
 
             XmlPullParser parser = Xml.newPullParser(); //由android.util.Xml创建一个XmlPullParser实例
-            parser.setInput(is, "UTF-8");               //设置输入流 并指明编码方式
+            parser.setInput(is, "UTF-8"); //设置输入流 并指明编码方式
 
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -178,9 +176,7 @@ public class ProgramDetailParser {
                         }
                         // 剧集列表
                         else if (parser.getName().equals("Channels")) {
-                            normalEpisodeList = new ArrayList<Episode>();
-                            hqEpisodeList = new ArrayList<Episode>();
-                            trailerEpisodeList = new ArrayList<Episode>();
+                            allTypesEpisodes = new HashMap<String, List<Episode>>();
                             String Total = parser.getAttributeValue(null, "Total");
                             XLog.d(TAG, "<Channels Total=" + Total + ">");
                         }
@@ -304,32 +300,27 @@ public class ProgramDetailParser {
                         if (parser.getName().equals("Sub")) {
                         } else if (parser.getName().equals("Channels")) {
                             if (!isThirdPart) {
-                                if (normalEpisodeList != null && normalEpisodeList.size() != 0)
-                                    programDetail.setPpsNormalEpisodes(normalEpisodeList);
-                                if (hqEpisodeList != null && hqEpisodeList.size() != 0)
-                                    programDetail.setPpsHqEpisodes(hqEpisodeList);
-                                if (trailerEpisodeList != null && trailerEpisodeList.size() != 0)
-                                    programDetail.setPpsTrailerEpisodes(trailerEpisodeList);
+                                programDetail.setPpsEpisodes(allTypesEpisodes);
                             } else {
-                                if (normalEpisodeList != null && normalEpisodeList.size() != 0)
-                                    thirdPart.setThirdPartNormalEpisodes(normalEpisodeList);
-                                if (hqEpisodeList != null && hqEpisodeList.size() != 0)
-                                    thirdPart.setThirdPartHqEpisodes(hqEpisodeList);
-                                if (trailerEpisodeList != null && trailerEpisodeList.size() != 0)
-                                    thirdPart.setThirdPartTrailerEpisodes(trailerEpisodeList);
+                                thirdPart.setThirdPartEpisodes(allTypesEpisodes);
                             }
-                            normalEpisodeList = null;
-                            hqEpisodeList = null;
-                            trailerEpisodeList = null;
+                            allTypesEpisodes = null;
                         } else if (parser.getName().equals("Channel")) {
-                            if (episode.isTrailer())
-                                trailerEpisodeList.add(episode);
-                            else if (episode.getTag().equals("国语高清"))
-                                hqEpisodeList.add(episode);
-                            else
-                                normalEpisodeList.add(episode);
+                            String tag;
+                            if (episode.isTrailer()) {
+                                tag = "预告花絮";
+                            } else {
+                                tag = episode.getTag();
+                            }
+                            List<Episode> episodeList = allTypesEpisodes.get(tag);
+                            if (episodeList == null) {
+                                episodeList = new ArrayList<Episode>();
+                                allTypesEpisodes.put(tag, episodeList);
+                            }
+                            episodeList.add(episode);
                             episode = null;
                         } else if (parser.getName().equals("ThirdPart")) {
+                            programDetail.setThirdPartList(thirdPartList);
                             thirdPartList = null;
                             isThirdPart = false;
                         } else if (parser.getName().equals("part")) {

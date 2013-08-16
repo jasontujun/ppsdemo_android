@@ -112,6 +112,9 @@ public class SystemMgr {
 
     public void clearSystem() {
         // clear image cache
+        MyImageScrollLocalLoader.getInstance().stopAndClear();
+        MyImageScrollRemoteLoader.getInstance().stopAndClear();
+
         MyImageViewRemoteLoader.getInstance().clearImageCache();
         MyImageScrollLocalLoader.getInstance().clearImageCache();
         MyImageScrollRemoteLoader.getInstance().clearImageCache();

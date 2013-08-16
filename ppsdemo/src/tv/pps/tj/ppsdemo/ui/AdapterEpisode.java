@@ -1,6 +1,7 @@
 package tv.pps.tj.ppsdemo.ui;
 
 import android.content.Context;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,9 +11,7 @@ import android.widget.Toast;
 import tv.pps.tj.ppsdemo.R;
 import tv.pps.tj.ppsdemo.data.model.Episode;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,136 +22,80 @@ import java.util.List;
  */
 public class AdapterEpisode extends BaseAdapter {
     private Context mContext;
-    private int mSelectedTab;// 选择
-    private boolean isNormalAscending, isHqAscending, isTrailerAscending;
-    private List<Episode> mNormalEpisodeList;// 国语普通
-    private List<Episode> mHqEpisodeList;
-    private List<Episode> mTrailerEpisodeList;
 
-    public AdapterEpisode(Context context,
-                          List<Episode> normalEpisodeList,
-                          List<Episode> hqEpisodeList,
-                          List<Episode> trailerEpisodeList) {
-        mContext = context;
-        if (normalEpisodeList != null) {
-            mNormalEpisodeList = new ArrayList<Episode>();
-            mNormalEpisodeList.addAll(normalEpisodeList);
-        }
-        if (hqEpisodeList != null) {
-            mHqEpisodeList = new ArrayList<Episode>();
-            mHqEpisodeList.addAll(hqEpisodeList);
-        }
-        if (trailerEpisodeList != null) {
-            mTrailerEpisodeList = new ArrayList<Episode>();
-            mTrailerEpisodeList.addAll(trailerEpisodeList);
-        }
-        isNormalAscending = true;
-        isHqAscending = true;
-        isTrailerAscending = true;
+    private Map<String, WrapperData> mAllTypeEpisodes;
+    private String mSelectedTab;// 选中的Tab
 
-        // 初始化tab标签号
-        if (normalEpisodeList != null) {
-            mSelectedTab = 0;
-        } else if (hqEpisodeList != null) {
-            mSelectedTab = 1;
-        } else {
-            mSelectedTab = 2;
+    private class WrapperData {
+        public List<Episode> episodes;// 剧集数据
+        public boolean isAscending;// 是否升序排列
+
+        private WrapperData(List<Episode> episodes, boolean ascending) {
+            this.episodes = episodes;
+            isAscending = ascending;
         }
     }
 
-    public int getSelectedTab() {
+    public AdapterEpisode(Context context,Map<String, List<Episode>> allTypeEpisodes) {
+        mContext = context;
+
+        mAllTypeEpisodes = new HashMap<String, WrapperData>();
+        for (Map.Entry<String, List<Episode>> entry: allTypeEpisodes.entrySet()) {
+            String tag = entry.getKey();
+            List<Episode> episodes = entry.getValue();
+            mAllTypeEpisodes.put(tag, new WrapperData
+                    (new ArrayList<Episode>(episodes), true));
+        }
+
+        mSelectedTab = mAllTypeEpisodes.keySet().iterator().next();
+    }
+
+    public String[] getTabList() {
+        Set<String> keys = mAllTypeEpisodes.keySet();
+        String[] result = new String[keys.size()];
+        keys.toArray(result);
+        return result;
+    }
+
+    public String getSelectedTab() {
         return mSelectedTab;
     }
 
-    public void setSelectedTab(int mSelectedTab) {
+    public void setSelectedTab(String mSelectedTab) {
         this.mSelectedTab = mSelectedTab;
         notifyDataSetChanged();
     }
 
-    public boolean isNormalAscending() {
-        return isNormalAscending;
+    public boolean isAscending() {
+        WrapperData wrapperData = mAllTypeEpisodes.get(mSelectedTab);
+        return wrapperData.isAscending;
     }
 
-    public void setNormalAscending(boolean normalAscending) {
-        if (isNormalAscending == normalAscending)
+    public void setAscending(boolean isAscending) {
+        WrapperData wrapperData = mAllTypeEpisodes.get(mSelectedTab);
+        if (wrapperData.isAscending == isAscending)
             return;
-        isNormalAscending = normalAscending;
-        Collections.reverse(mNormalEpisodeList);
+        wrapperData.isAscending = isAscending;
+        Collections.reverse(wrapperData.episodes);
         notifyDataSetChanged();
-    }
-
-    public boolean isHqAscending() {
-        return isHqAscending;
-    }
-
-    public void setHqAscending(boolean hqAscending) {
-        if (isHqAscending == hqAscending)
-            return;
-        isHqAscending = hqAscending;
-        Collections.reverse(mHqEpisodeList);
-        notifyDataSetChanged();
-    }
-
-    public boolean isTrailerAscending() {
-        return isTrailerAscending;
-    }
-
-    public void setTrailerAscending(boolean trailerAscending) {
-        if (isTrailerAscending == trailerAscending)
-            return;
-        isTrailerAscending = trailerAscending;
-        Collections.reverse(mTrailerEpisodeList);
-        notifyDataSetChanged();
-    }
-
-    public List<Episode> getNormalEpisodeList() {
-        return mNormalEpisodeList;
-    }
-
-    public List<Episode> getHqEpisodeList() {
-        return mHqEpisodeList;
-    }
-
-    public List<Episode> getTrailerEpisodeList() {
-        return mTrailerEpisodeList;
     }
 
     @Override
     public int getCount() {
-        switch (mSelectedTab) {
-            case 0:
-                if (mNormalEpisodeList != null)
-                    return mNormalEpisodeList.size();
-                break;
-            case 1:
-                if (mHqEpisodeList != null)
-                    return mHqEpisodeList.size();
-                break;
-            case 2:
-                if (mTrailerEpisodeList != null)
-                    return mTrailerEpisodeList.size();
-                break;
-        }
-        return 0;
+        WrapperData wrapperData = mAllTypeEpisodes.get(mSelectedTab);
+        if (wrapperData == null || wrapperData.episodes == null)
+            return 0;
+        else
+            return wrapperData.episodes.size();
     }
 
     @Override
     public Object getItem(int i) {
-        switch (mSelectedTab) {
-            case 0:
-                if (mNormalEpisodeList != null)
-                    return mNormalEpisodeList.get(i);
-                break;
-            case 1:
-                if (mHqEpisodeList != null)
-                    return mHqEpisodeList.get(i);
-                break;
-            case 2:
-                if (mTrailerEpisodeList != null)
-                    return mTrailerEpisodeList.get(i);
-                break;
-        }
-        return null;
+        WrapperData wrapperData = mAllTypeEpisodes.get(mSelectedTab);
+        if (wrapperData == null || wrapperData.episodes == null)
+            return null;
+        else
+            return wrapperData.episodes.get(i);
     }
 
     @Override
@@ -191,6 +134,13 @@ public class AdapterEpisode extends BaseAdapter {
             holder.episodeTypeView.setVisibility(View.GONE);
         }
         holder.episodeNameView.setText(episode.getName());
+        if ("预告花絮".equals(mSelectedTab)) {
+            // 如果是预告花絮，则左对齐
+            holder.episodeNameView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+        } else {
+            // 如果是国语高清或国语普通，则居中
+            holder.episodeNameView.setGravity(Gravity.CENTER);
+        }
         holder.episodeNameView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

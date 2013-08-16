@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import tv.pps.tj.ppsdemo.R;
 
 /**
@@ -20,6 +21,8 @@ import tv.pps.tj.ppsdemo.R;
 public class FragmentHome extends Fragment {
 
     private ImageView mMenuBtn;
+    private TextView mFragmentNameView;
+
     private View.OnClickListener mMenuBtnListener;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -27,7 +30,12 @@ public class FragmentHome extends Fragment {
         // Inflate the layout containing a title and body text.
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.home_frame, container, false);
         mMenuBtn = (ImageView) rootView.findViewById(R.id.menu_btn);
+        mFragmentNameView = (TextView) rootView.findViewById(R.id.title_txt);
+
         mMenuBtn.setOnClickListener(mMenuBtnListener);  // 设置菜单按钮的监听
+
+        String fragmentName = getArguments().getString("name");// 传进来的参数
+        mFragmentNameView.setText(fragmentName);
 
         return rootView;
     }

@@ -32,13 +32,17 @@ public class MyImageScrollRemoteLoader extends XScrollRemoteLoader {
     public String getLocalImage(String imgUrl) {
         ImageSource imageSource = (ImageSource) DefaultDataRepo.
                 getInstance().getSource(SourceName.IMAGE);
-        return imageSource.getLocalImage(imgUrl);
+        if (imageSource != null)
+            return imageSource.getLocalImage(imgUrl);
+        else
+            return null;
     }
 
     @Override
     public void setLocalImage(String imgUrl, String localImageFile) {
         ImageSource imageSource = (ImageSource) DefaultDataRepo.
                 getInstance().getSource(SourceName.IMAGE);
-        imageSource.putImage(imgUrl, localImageFile);
+        if (imageSource != null)
+            imageSource.putImage(imgUrl, localImageFile);
     }
 }

@@ -36,20 +36,75 @@ public class FragmentContainer extends Fragment {
     public void selectMenu(int index) {
         if (index != mSelectedMenuIndex) {
             mSelectedMenuIndex = index;
+
+            if (getFragmentManager().getBackStackEntryCount() > 0)
+                getFragmentManager().popBackStack();
+
+            Fragment fragment = null;
+            Bundle args = null;
             switch (mSelectedMenuIndex) {
                 case 0:
-                    Fragment channel = new FragmentChannel();
-                    Bundle args = new Bundle();
+                    fragment = new FragmentChannel();
+                    args = new Bundle();
                     args.putInt("mode", FragmentChannel.MODE_LISTVIEW);
                     args.putString("name", "内地剧场");
-                    channel.setArguments(args);
-                    getFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.container, channel)
-                            .commit();
+                    fragment.setArguments(args);
+                    break;
+                case 1:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "搜索");
+                    fragment.setArguments(args);
+                    break;
+                case 2:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "爱频道");
+                    fragment.setArguments(args);
+                    break;
+                case 3:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "会员");
+                    fragment.setArguments(args);
+                    break;
+                case 4:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "我的视频");
+                    fragment.setArguments(args);
+                    break;
+                case 5:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "离线频道");
+                    fragment.setArguments(args);
+                    break;
+                case 6:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "游戏中心");
+                    fragment.setArguments(args);
+                    break;
+                case 7:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "阅读");
+                    fragment.setArguments(args);
+                    break;
+                case 8:
+                    fragment = new FragmentHome();
+                    args = new Bundle();
+                    args.putString("name", "设置");
+                    fragment.setArguments(args);
                     break;
                 default:
             }
+            if (fragment != null)
+                getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .commit();
         }
     }
 
@@ -60,7 +115,7 @@ public class FragmentContainer extends Fragment {
     public void addFragment(Fragment fragment) {
         getFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, fragment)
+                .add(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
     }

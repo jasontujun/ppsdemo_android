@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,10 +52,11 @@ public class FragmentProgram extends Fragment {
     private ImageView mSrcBtnTip;
     private GridView mSrcGridView;
     private TextView mProgramBriefView;// 简介栏
-    private View mTabNormal, mTabHq, mTabTrailer;
-    private ImageView mTabTipNormal, mTabTipHq, mTabTipTrailer;
-    private GridView mEpisodeFrame;// 剧集标签
+    private View mTabLeftBtn, mTabRightBtn;
+    private ViewPager mEpisodeTabFrame;// 剧集标签栏
+    private GridView mEpisodeGridView;// 剧集表格
     private View mFavoriteBtn, mShareBtn, mCommentBtn;
+    private EpisodeTabViewPagerAdapter mTabAdapter;
     private AdapterEpisode mPpsAdapter;
     private List<AdapterEpisode> mThirdPartAdapters;
 
@@ -92,13 +95,10 @@ public class FragmentProgram extends Fragment {
         mSrcBtnTip = (ImageView) rootView.findViewById(R.id.src_tip);
         mSrcGridView = (GridView) rootView.findViewById(R.id.src_gridview);
         mProgramBriefView = (TextView) rootView.findViewById(R.id.program_brief);
-        mTabNormal = rootView.findViewById(R.id.type_tab_normal);
-        mTabHq = rootView.findViewById(R.id.type_tab_hq);
-        mTabTrailer = rootView.findViewById(R.id.type_tab_trailer);
-        mTabTipNormal = (ImageView) rootView.findViewById(R.id.tab_order_normal);
-        mTabTipHq = (ImageView) rootView.findViewById(R.id.tab_order_hq);
-        mTabTipTrailer = (ImageView) rootView.findViewById(R.id.tab_order_trailer);
-        mEpisodeFrame = (GridView) rootView.findViewById(R.id.episode_frame);
+        mTabLeftBtn = rootView.findViewById(R.id.type_left_btn);
+        mTabRightBtn = rootView.findViewById(R.id.type_right_btn);
+        mEpisodeTabFrame = (ViewPager) rootView.findViewById(R.id.episode_tab_frame);
+        mEpisodeGridView = (GridView) rootView.findViewById(R.id.episode_frame);
         mFavoriteBtn = rootView.findViewById(R.id.favour_btn);
         mShareBtn = rootView.findViewById(R.id.share_btn);
         mCommentBtn = rootView.findViewById(R.id.comment_btn);
@@ -131,6 +131,20 @@ public class FragmentProgram extends Fragment {
                     mSrcGridView.setVisibility(View.VISIBLE);
                     mSrcBtnTip.setImageResource(R.drawable.ic_third_shouqi);
                 }
+            }
+        });
+        mTabLeftBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mEpisodeTabFrame.getCurrentItem() > 0)
+                    mEpisodeTabFrame.setCurrentItem(mEpisodeTabFrame.getCurrentItem() - 1);
+            }
+        });
+        mTabRightBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mEpisodeTabFrame.getCurrentItem() < mTabAdapter.getCount() - 1)
+                    mEpisodeTabFrame.setCurrentItem(mEpisodeTabFrame.getCurrentItem() + 1);
             }
         });
         mFavoriteBtn.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +203,6 @@ public class FragmentProgram extends Fragment {
         }
     }
 
-
     /**
      * 刷新节目的信息（整个界面）
      */
@@ -226,14 +239,10 @@ public class FragmentProgram extends Fragment {
             for (ThirdPart thirdPart : mProgramDetail.getThirdPartList())
                 mThirdPartAdapters.add(
                         new AdapterEpisode(getActivity(),
-                        thirdPart.getThirdPartNormalEpisodes(),
-                        thirdPart.getThirdPartHqEpisodes(),
-                        thirdPart.getThirdPartTrailerEpisodes()));
+                                thirdPart.getThirdPartEpisodes()));
         }
         mPpsAdapter = new AdapterEpisode(getActivity(),
-                mProgramDetail.getPpsNormalEpisodes(),
-                mProgramDetail.getPpsHqEpisodes(),
-                mProgramDetail.getPpsTrailerEpisodes());
+                mProgramDetail.getPpsEpisodes());
 
         // 初始化剧集
         refreshEpisode();
@@ -254,7 +263,7 @@ public class FragmentProgram extends Fragment {
             mDownloadBtnTxt.setTextColor(getActivity().getResources().getColor(R.color.black));
             // 初始化剧集
             adapter = mPpsAdapter;
-            mEpisodeFrame.setAdapter(adapter);
+            mEpisodeGridView.setAdapter(adapter);
         } else {
             // 下载按钮
             mDownloadBtn.setClickable(false);
@@ -262,60 +271,16 @@ public class FragmentProgram extends Fragment {
             mDownloadBtnTxt.setTextColor(getActivity().getResources().getColor(R.color.gray));
             // 初始化剧集
             adapter = mThirdPartAdapters.get(mSelectedSrcIndex);
-            mEpisodeFrame.setAdapter(adapter);
+            mEpisodeGridView.setAdapter(adapter);
         }
+        if (adapter.getSelectedTab().equals("预告花絮"))
+            mEpisodeGridView.setNumColumns(1);
+        else
+            mEpisodeGridView.setNumColumns(5);
         // TODO 初始化标签栏
-        // tab有无
-        if (adapter.getNormalEpisodeList() != null)
-            mTabNormal.setVisibility(View.VISIBLE);
-        else
-            mTabNormal.setVisibility(View.GONE);
-        if (adapter.getHqEpisodeList() != null)
-            mTabHq.setVisibility(View.VISIBLE);
-        else
-            mTabHq.setVisibility(View.GONE);
-        if (adapter.getTrailerEpisodeList() != null)
-            mTabTrailer.setVisibility(View.VISIBLE);
-        else
-            mTabTrailer.setVisibility(View.GONE);
-        // tab颜色
-        mTabNormal.setBackgroundResource(R.drawable.tab_3l_gray);
-        mTabHq.setBackgroundResource(R.drawable.tab_3l_gray);
-        mTabTrailer.setBackgroundResource(R.drawable.tab_3l_gray);
-        mTabTipNormal.setVisibility(View.GONE);
-        mTabTipHq.setVisibility(View.GONE);
-        mTabTipTrailer.setVisibility(View.GONE);
-        final int selectedTab = adapter.getSelectedTab();
-        switch (selectedTab) {
-            case 0:
-                mTabNormal.setBackgroundResource(R.drawable.tab_3l_white);
-                mTabTipNormal.setVisibility(View.VISIBLE);
-                if (adapter.isNormalAscending())
-                    mTabTipNormal.setImageResource(R.drawable.ic_details_arrow_up);
-                else
-                    mTabTipNormal.setImageResource(R.drawable.ic_details_arrow_down);
-                break;
-            case 1:
-                mTabHq.setBackgroundResource(R.drawable.tab_3l_white);
-                mTabTipHq.setVisibility(View.VISIBLE);
-                if (adapter.isHqAscending())
-                    mTabTipHq.setImageResource(R.drawable.ic_details_arrow_up);
-                else
-                    mTabTipHq.setImageResource(R.drawable.ic_details_arrow_down);
-                break;
-            case 2:
-                mTabTrailer.setBackgroundResource(R.drawable.tab_3l_white);
-                mTabTipTrailer.setVisibility(View.VISIBLE);
-                if (adapter.isTrailerAscending())
-                    mTabTipTrailer.setImageResource(R.drawable.ic_details_arrow_up);
-                else
-                    mTabTipTrailer.setImageResource(R.drawable.ic_details_arrow_down);
-                break;
-        }
-        // tab监听
-        mTabNormal.setOnClickListener(new TabClickListener(0, adapter));
-        mTabHq.setOnClickListener(new TabClickListener(1, adapter));
-        mTabTrailer.setOnClickListener(new TabClickListener(2, adapter));
+        mTabAdapter = new EpisodeTabViewPagerAdapter(getActivity(), adapter);
+        mEpisodeTabFrame.setAdapter(mTabAdapter);
+        mEpisodeTabFrame.setCurrentItem(mTabAdapter.getSelectedIndex());
     }
 
     private void addPeopleItemToLinearFrame(String people, LinearLayout frame) {
@@ -353,39 +318,6 @@ public class FragmentProgram extends Fragment {
             // TODO 跳转到搜索界面
             Toast.makeText(getActivity(), "点击了“" + people + "”，跳转到搜索界面",
                     Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * 资源类别tab的点击监听
-     */
-    private class TabClickListener implements View.OnClickListener {
-        private int mSelfIndex;
-        AdapterEpisode mAdapter;
-
-        private TabClickListener(int selfIndex, AdapterEpisode adapter) {
-            mSelfIndex = selfIndex;
-            mAdapter = adapter;
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (mAdapter.getSelectedTab() != mSelfIndex) {
-                mAdapter.setSelectedTab(mSelfIndex);
-            } else {
-                switch (mSelfIndex) {
-                    case 0:
-                        mAdapter.setNormalAscending(!mAdapter.isNormalAscending());
-                        break;
-                    case 1:
-                        mAdapter.setHqAscending(!mAdapter.isHqAscending());
-                        break;
-                    case 2:
-                        mAdapter.setTrailerAscending(!mAdapter.isTrailerAscending());
-                        break;
-                }
-            }
-            refreshEpisode();
         }
     }
 
@@ -511,6 +443,127 @@ public class FragmentProgram extends Fragment {
             }
 
             return convertView;
+        }
+    }
+
+    /**
+     * 剧集标签的adapter
+     */
+    private class EpisodeTabViewPagerAdapter extends PagerAdapter {
+        private Context mContext;
+        private AdapterEpisode mEpisodeAdapter;
+        private String[] mTabs;
+        private View[] mViews;
+        private class ViewHolder {
+            public TextView tabTextView1;
+            public TextView tabTextView2;
+            public ImageView tabTipView;
+        }
+
+        private EpisodeTabViewPagerAdapter(Context context,
+                                           AdapterEpisode episodeAdapter) {
+            mContext = context;
+            mEpisodeAdapter = episodeAdapter;
+            mTabs = mEpisodeAdapter.getTabList();
+            mViews = new View[mTabs.length];
+        }
+
+        public int getSelectedIndex() {
+            String selectedTab = mEpisodeAdapter.getSelectedTab();
+            for (int i = 0; i<mTabs.length; i++) {
+                if (selectedTab.equals(mTabs[i]))
+                    return i;
+            }
+            return -1;
+        }
+
+        @Override
+        public boolean isViewFromObject(View arg0, Object arg1) {
+            return arg0 == arg1;
+        }
+
+        @Override
+        public int getCount() {
+            return mTabs.length;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position,
+                                Object object) {
+            View view = mViews[position];
+            if (view != null)
+                container.removeView(view);
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return super.getItemPosition(object);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, final int position) {
+            View convertView = mViews[position];
+            ViewHolder holder = null;
+            if (convertView == null) {
+                convertView = View.inflate(mContext, R.layout.episode_type_item, null);
+                holder = new ViewHolder();
+                holder.tabTextView1 = (TextView) convertView.findViewById(R.id.tab_txt1);
+                holder.tabTextView2 = (TextView) convertView.findViewById(R.id.tab_txt2);
+                holder.tabTipView = (ImageView) convertView.findViewById(R.id.tab_tip);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            final String tab = mTabs[position];
+            String txt1 = tab.substring(0, 2);
+            String txt2 = tab.substring(2, 4);
+            holder.tabTextView1.setText(txt1);
+            holder.tabTextView2.setText(txt2);
+
+            if ("高清".equals(txt2))
+                holder.tabTextView2.setTextColor(mContext.getResources().getColor(R.color.dark_blue));
+            else
+                holder.tabTextView2.setTextColor(mContext.getResources().getColor(R.color.black));
+
+            String selectedTab = mEpisodeAdapter.getSelectedTab();
+            if (tab.equals(selectedTab)) {
+                holder.tabTipView.setVisibility(View.VISIBLE);
+                if (mEpisodeAdapter.isAscending())
+                    holder.tabTipView.setImageResource(R.drawable.ic_details_arrow_up);
+                else
+                    holder.tabTipView.setImageResource(R.drawable.ic_details_arrow_down);
+                convertView.setBackgroundResource(R.drawable.tab_3l_white);
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mEpisodeAdapter.setAscending(!mEpisodeAdapter.isAscending());
+                        refreshEpisode();
+                    }
+                });
+            } else {
+                holder.tabTipView.setVisibility(View.GONE);
+                convertView.setBackgroundResource(R.drawable.tab_3l_gray);
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mEpisodeAdapter.setSelectedTab(tab);
+                        refreshEpisode();
+                    }
+                });
+            }
+
+            container.addView(convertView);
+            return convertView;
+        }
+
+        @Override
+        public float getPageWidth(int position) {
+            XScreen screen = ScreenHolder.getInstance();
+            float sWidthPx = mEpisodeTabFrame.getWidth();
+            float menuWidthPx = screen.dp2px(65);
+            float proportion = menuWidthPx / sWidthPx;
+            return proportion;
         }
     }
 }

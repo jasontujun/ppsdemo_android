@@ -20,6 +20,7 @@ import tv.pps.tj.ppsdemo.R;
 import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
 import tv.pps.tj.ppsdemo.data.cache.SourceName;
 import tv.pps.tj.ppsdemo.data.model.ProgramBase;
+import tv.pps.tj.ppsdemo.engine.MyImageScrollRemoteLoader;
 import tv.pps.tj.ppsdemo.engine.ScreenHolder;
 import tv.pps.tj.ppsdemo.logic.ProgramMgr;
 import tv.pps.tj.ppsdemo.ui.animation.Rotate3dAnimationHelper;
@@ -54,7 +55,7 @@ public class FragmentChannel extends Fragment {
     private EditText mSearchInput;
     private Button mClearInputBtn;
     private TextView mTabView1, mTabView2, mTabView3, mTabView4;
-    private ImageView mTabTip;
+    private ImageView mTabTip1, mTabTip2, mTabTip3, mTabTip4;
     private LinearLayout mFilterFrame;// 过滤栏
     private RelativeLayout mProgramContentFrame;
     private ListView mProgramListView;// 节目的列表界面
@@ -91,7 +92,10 @@ public class FragmentChannel extends Fragment {
         mTabView2 = (TextView) rootView.findViewById(R.id.tab_txt2);
         mTabView3 = (TextView) rootView.findViewById(R.id.tab_txt3);
         mTabView4 = (TextView) rootView.findViewById(R.id.tab_txt4);
-        mTabTip = (ImageView) rootView.findViewById(R.id.tab_tip);
+        mTabTip1 = (ImageView) rootView.findViewById(R.id.tab_tip1);
+        mTabTip2 = (ImageView) rootView.findViewById(R.id.tab_tip2);
+        mTabTip3 = (ImageView) rootView.findViewById(R.id.tab_tip3);
+        mTabTip4 = (ImageView) rootView.findViewById(R.id.tab_tip4);
         mFilterFrame = (LinearLayout) rootView.findViewById(R.id.filter_frame);
         mProgramContentFrame = (RelativeLayout) rootView.findViewById(R.id.content_list_grid_frame);
         mProgramListView = (ListView) rootView.findViewById(R.id.program_listview);
@@ -426,26 +430,38 @@ public class FragmentChannel extends Fragment {
         mTabView2.setTextColor(getActivity().getResources().getColor(R.color.black));
         mTabView3.setTextColor(getActivity().getResources().getColor(R.color.black));
         mTabView4.setTextColor(getActivity().getResources().getColor(R.color.black));
+        mTabTip1.setVisibility(View.INVISIBLE);
+        mTabTip2.setVisibility(View.INVISIBLE);
+        mTabTip3.setVisibility(View.INVISIBLE);
+        mTabTip4.setVisibility(View.INVISIBLE);
         switch (mSelectedTabIndex) {
             case 0:
+                MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=0");
                 mProgramBaseSource.sort(ProgramBase.getHotComparator());
                 mTabView1.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                mTabTip1.setVisibility(View.VISIBLE);
                 break;
             case 1:
+                MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=1");
                 mProgramBaseSource.sort(ProgramBase.getTimeComparator());
                 mTabView2.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                mTabTip2.setVisibility(View.VISIBLE);
                 break;
             case 2:
+                MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=2");
                 mProgramBaseSource.sort(ProgramBase.getScoreComparator());
                 mTabView3.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                mTabTip3.setVisibility(View.VISIBLE);
                 break;
             case 3:
+                MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=3");
                 mProgramBaseSource.sort(ProgramBase.getLetterComparator());
                 mTabView4.setTextColor(getActivity().getResources().getColor(R.color.orange));
+                mTabTip4.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;

@@ -159,7 +159,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
-                                    android:text="演员："
+                                    android:text="主演："
                                     android:textSize="13sp"
                                     android:textColor="@color/light_black"/>
                         </LinearLayout>
@@ -175,7 +175,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
-                                android:layout_marginTop="3dp"
                                 android:text="8.3"
                                 android:textSize="20sp"
                                 android:textColor="@color/orange"/>
@@ -303,193 +302,43 @@
                             android:textColor="@color/light_black"
                             android:maxLines="2"/>
                 </RelativeLayout>
-                <!--资源类别栏-->
+                <!--剧集tab栏-->
                 <RelativeLayout
                         android:layout_width="fill_parent"
                         android:layout_height="40dp">
                     <!--左按钮-->
-                    <LinearLayout
+                    <ImageView
                             android:id="@+id/type_left_btn"
-                            android:layout_width="wrap_content"
+                            android:layout_width="60dp"
                             android:layout_height="fill_parent"
-                            android:orientation="horizontal"
-                            android:background="@drawable/tab_3l_gray">
-                        <ImageView
-                                android:layout_width="60dp"
-                                android:layout_height="fill_parent"
-                                android:padding="10dp"
-                                android:src="@drawable/ic_ipd1l_left"/>
-                        <ImageView
-                                android:layout_width="0.5dp"
-                                android:layout_height="fill_parent"
-                                android:src="@color/gray"/>
-                    </LinearLayout>
+                            android:padding="10dp"
+                            android:src="@drawable/ic_ipd1l_left"
+                            android:background="@drawable/tab_3l_gray"/>
                     <!--右按钮-->
-                    <LinearLayout
+                    <ImageView
                             android:id="@+id/type_right_btn"
-                            android:layout_width="wrap_content"
+                            android:layout_width="60dp"
                             android:layout_height="fill_parent"
                             android:layout_alignParentRight="true"
-                            android:orientation="horizontal"
-                            android:background="@drawable/tab_3l_gray">
-                        <ImageView
-                                android:layout_width="0.5dp"
-                                android:layout_height="fill_parent"
-                                android:src="@color/gray"/>
-                        <ImageView
-                                android:layout_width="60dp"
-                                android:layout_height="fill_parent"
-                                android:padding="10dp"
-                                android:src="@drawable/ic_ipd1l_right"
-                                android:background="@drawable/tab_3l_gray"/>
-                    </LinearLayout>
+                            android:padding="10dp"
+                            android:src="@drawable/ic_ipd1l_right"
+                            android:background="@drawable/tab_3l_gray"/>
                     <!--类别标签-->
-                        <LinearLayout
-                                android:layout_width="fill_parent"
-                                android:layout_height="fill_parent"
-                                android:layout_toRightOf="@+id/type_left_btn"
-                                android:layout_toLeftOf="@+id/type_right_btn"
-                                android:orientation="horizontal"
-                                android:background="@drawable/tab_3l_gray">
-                            <!--国语普通-->
-                            <RelativeLayout
-                                    android:id="@+id/type_tab_normal"
-                                    android:layout_width="65dp"
-                                    android:layout_height="fill_parent"
-                                    android:background="@drawable/tab_3l_white">
-                                <LinearLayout
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="fill_parent"
-                                        android:layout_centerInParent="true"
-                                        android:orientation="horizontal">
-                                    <LinearLayout
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_gravity="center_vertical"
-                                            android:orientation="vertical">
-                                        <TextView
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="wrap_content"
-                                                android:text="国语"
-                                                android:textSize="13sp"
-                                                android:textColor="@color/black"/>
-                                        <TextView
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="wrap_content"
-                                                android:text="普通"
-                                                android:textSize="13sp"
-                                                android:textColor="@color/black"/>
-                                    </LinearLayout>
-                                    <ImageView
-                                            android:id="@+id/tab_order_normal"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginLeft="6dp"
-                                            android:layout_gravity="center_vertical"
-                                            android:src="@drawable/ic_details_arrow_up"/>
-                                </LinearLayout>
-                            </RelativeLayout>
-                            <ImageView
-                                    android:layout_width="0.5dp"
-                                    android:layout_height="fill_parent"
-                                    android:paddingTop="10dp"
-                                    android:paddingBottom="10dp"
-                                    android:src="@color/gray"/>
-                            <!--国语高清-->
-                            <RelativeLayout
-                                    android:id="@+id/type_tab_hq"
-                                    android:layout_width="65dp"
-                                    android:layout_height="fill_parent"
-                                    android:background="@drawable/tab_3l_gray">
-                                <LinearLayout
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="fill_parent"
-                                        android:layout_centerInParent="true"
-                                        android:orientation="horizontal">
-                                    <LinearLayout
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_gravity="center_vertical"
-                                            android:orientation="vertical">
-                                        <TextView
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="wrap_content"
-                                                android:text="国语"
-                                                android:textSize="13sp"
-                                                android:textColor="@color/black"/>
-                                        <TextView
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="wrap_content"
-                                                android:text="高清"
-                                                android:textSize="13sp"
-                                                android:textColor="@color/dark_blue"/>
-                                    </LinearLayout>
-                                    <ImageView
-                                            android:id="@+id/tab_order_hq"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginLeft="6dp"
-                                            android:layout_gravity="center_vertical"
-                                            android:src="@drawable/ic_details_arrow_up"
-                                            android:visibility="gone"/>
-                                </LinearLayout>
-                            </RelativeLayout>
-                            <ImageView
-                                    android:layout_width="0.5dp"
-                                    android:layout_height="fill_parent"
-                                    android:paddingTop="10dp"
-                                    android:paddingBottom="10dp"
-                                    android:src="@color/gray"/>
-                            <!--预告花絮-->
-                            <RelativeLayout
-                                    android:id="@+id/type_tab_trailer"
-                                    android:layout_width="65dp"
-                                    android:layout_height="fill_parent"
-                                    android:background="@drawable/tab_3l_gray">
-                                <LinearLayout
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="fill_parent"
-                                        android:layout_centerInParent="true"
-                                        android:orientation="horizontal">
-                                    <LinearLayout
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_gravity="center_vertical"
-                                            android:orientation="vertical">
-                                        <TextView
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="wrap_content"
-                                                android:text="预告"
-                                                android:textSize="13sp"
-                                                android:textColor="@color/black"/>
-                                        <TextView
-                                                android:layout_width="fill_parent"
-                                                android:layout_height="wrap_content"
-                                                android:text="花絮"
-                                                android:textSize="13sp"
-                                                android:textColor="@color/black"/>
-                                    </LinearLayout>
-                                    <ImageView
-                                            android:id="@+id/tab_order_trailer"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginLeft="6dp"
-                                            android:layout_gravity="center_vertical"
-                                            android:src="@drawable/ic_details_arrow_up"
-                                            android:visibility="gone"/>
-                                </LinearLayout>
-                            </RelativeLayout>
-                        </LinearLayout>
+                    <android.support.v4.view.ViewPager
+                            android:id="@+id/episode_tab_frame"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:layout_toRightOf="@+id/type_left_btn"
+                            android:layout_toLeftOf="@+id/type_right_btn"
+                            android:background="@drawable/tab_3l_gray"/>
                 </RelativeLayout>
                 <!--集数列表-->
                 <!--style="@style/gridview"-->
-                <GridView
-                        style="@style/gridview"
+                <tv.pps.tj.ppsdemo.ui.controls.UnScrollGridView
                         android:id="@+id/episode_frame"
                         android:layout_width="fill_parent"
-                        android:layout_height="500dp"
-                        android:columnWidth="50dp"
-                        android:numColumns="auto_fit"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
                         android:horizontalSpacing="10dp"
                         android:verticalSpacing="10dp"
                         android:background="@color/white"/>

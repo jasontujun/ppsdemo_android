@@ -174,12 +174,36 @@
                 android:background="@drawable/bg_transparent_orange"/>
     </LinearLayout>
     <!--tab标签栏提示-->
-    <ImageView
-            android:id="@+id/tab_tip"
+    <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="3dp"
-            android:layout_alignParentBottom="true"
-            android:src="@color/orange"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/light_gray">
+        <ImageView
+                android:id="@+id/tab_tip1"
+                android:layout_width="fill_parent"
+                android:layout_height="3dp"
+                android:layout_weight="1"
+                android:src="@color/orange"/>
+        <ImageView
+                android:id="@+id/tab_tip2"
+                android:layout_width="fill_parent"
+                android:layout_height="3dp"
+                android:layout_weight="1"
+                android:src="@color/orange"/>
+        <ImageView
+                android:id="@+id/tab_tip3"
+                android:layout_width="fill_parent"
+                android:layout_height="3dp"
+                android:layout_weight="1"
+                android:src="@color/orange"/>
+        <ImageView
+                android:id="@+id/tab_tip4"
+                android:layout_width="fill_parent"
+                android:layout_height="3dp"
+                android:layout_weight="1"
+                android:src="@color/orange"/>
+    </LinearLayout>
     <ImageView
             android:layout_width="fill_parent"
             android:layout_height="0.5dp"

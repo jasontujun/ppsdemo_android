@@ -7,11 +7,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import com.xengine.android.media.graphics.XAndroidScreen;
+import android.widget.Toast;
 import com.xengine.android.media.graphics.XScreen;
+import com.xengine.android.utils.XLog;
 import tv.pps.tj.ppsdemo.R;
+import tv.pps.tj.ppsdemo.engine.ScreenHolder;
 import tv.pps.tj.ppsdemo.logic.SystemMgr;
 
 /**
@@ -22,6 +25,9 @@ import tv.pps.tj.ppsdemo.logic.SystemMgr;
  * To change this template use File | Settings | File Templates.
  */
 public class ActivityMain extends FragmentActivity {
+
+    private static final int PRESS_BACK_INTERVAL = 1500; // back按键间隔，单位：毫秒
+    private long lastBackTime;// 上一次back键的时间
 
     private ViewPager mDragMenu;// 可拖动图层
     private PagerAdapter mDragMenuAdapter;
@@ -58,6 +64,39 @@ public class ActivityMain extends FragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent e) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                XLog.d("MAIN", "key_back!!");
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportFragmentManager().popBackStack();
+                    return false;
+                } else if (!mShowingMenu) {
+                    mDragMenu.setCurrentItem(0);
+                    return true;
+                } else {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastBackTime <= PRESS_BACK_INTERVAL) {
+                        SystemMgr.getInstance().clearSystem();
+                        finish();
+                    } else {
+                        lastBackTime = currentTime;
+                        Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
+                }
+            case KeyEvent.KEYCODE_MENU:
+                XLog.d("MAIN", "key_menu!!");
+                if (!mShowingMenu)
+                    mDragMenu.setCurrentItem(0);
+                else
+                    mDragMenu.setCurrentItem(1);
+                return true;
+        }
+        return false;
     }
 
     /**
@@ -111,7 +150,7 @@ public class ActivityMain extends FragmentActivity {
         public DragMenuAdapter(FragmentManager fm) {
             super(fm);
             // 计算左边栏的宽度比例
-            XScreen screen = new XAndroidScreen(ActivityMain.this);
+            XScreen screen = ScreenHolder.getInstance();
             float sWidthPx = screen.getScreenWidth();// 单位：像素
             float menuWidthPx = screen.dp2px(50);
             mLeftMenuWidthProportion = menuWidthPx / sWidthPx;
@@ -130,6 +169,7 @@ public class ActivityMain extends FragmentActivity {
             return NUM_PAGES;
         }
 
+        @Override
         public float getPageWidth(int position) {
             if (position == 0)
                 return mLeftMenuWidthProportion;
