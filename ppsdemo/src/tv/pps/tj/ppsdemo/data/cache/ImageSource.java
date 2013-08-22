@@ -1,7 +1,7 @@
 package tv.pps.tj.ppsdemo.data.cache;
 
+import android.text.TextUtils;
 import com.xengine.android.data.cache.XDataSource;
-import com.xengine.android.utils.XStringUtil;
 
 import java.util.HashMap;
 
@@ -27,7 +27,7 @@ public class ImageSource implements XDataSource {
     }
 
     public boolean containsLocalImage(String imageUrl) {
-        if (XStringUtil.isNullOrEmpty(imageUrl)) {
+        if (TextUtils.isEmpty(imageUrl)) {
             return false;
         }
 
@@ -36,7 +36,7 @@ public class ImageSource implements XDataSource {
         }
 
         String localImageFile = images.get(imageUrl);
-        return XStringUtil.isNullOrEmpty(localImageFile);
+        return TextUtils.isEmpty(localImageFile);
     }
 
     public String getLocalImage(String imageUrl) {

@@ -1,8 +1,8 @@
 package tv.pps.tj.ppsdemo.data.xml;
 
+import android.text.TextUtils;
 import android.util.Xml;
 import com.xengine.android.utils.XLog;
-import com.xengine.android.utils.XStringUtil;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import tv.pps.tj.ppsdemo.data.model.Episode;
@@ -84,25 +84,25 @@ public class ProgramDetailParser {
                             eventType = parser.next();
                             String actors = parser.getText();
                             XLog.d(TAG, "<actor>" + actors + "</actor>");
-                            if (!XStringUtil.isNullOrEmpty(actors))
+                            if (!TextUtils.isEmpty(actors))
                                 programDetail.setActor(actors.split(","));
                         } else if (parser.getName().equals("vote_count")) {
                             eventType = parser.next();
                             String vote_count = parser.getText();
                             XLog.d(TAG, "<vote_count>" + vote_count + "</vote_count>");
-                            if (!XStringUtil.isNullOrEmpty(vote_count))
+                            if (!TextUtils.isEmpty(vote_count))
                                 programDetail.setVoteCount(Integer.parseInt(vote_count));
                         } else if (parser.getName().equals("block")) {
                             eventType = parser.next();
                             String block = parser.getText();
                             XLog.d(TAG, "<block>" + block + "</block>");
-                            if (!XStringUtil.isNullOrEmpty(block))
+                            if (!TextUtils.isEmpty(block))
                                 programDetail.setBlackList(block.split(";"));
                         } else if (parser.getName().equals("wlock")) {
                             eventType = parser.next();
                             String wlock = parser.getText();
                             XLog.d(TAG, "<wlock>" + wlock + "</wlock>");
-                            if (!XStringUtil.isNullOrEmpty(wlock))
+                            if (!TextUtils.isEmpty(wlock))
                                 programDetail.setWhiteList(wlock.split(";"));
                         } else if (parser.getName().equals("name")) {
                             eventType = parser.next();
@@ -113,7 +113,7 @@ public class ProgramDetailParser {
                             eventType = parser.next();
                             String vote = parser.getText();
                             XLog.d(TAG, "<vote>" + vote + "</vote>");
-                            if (!XStringUtil.isNullOrEmpty(vote))
+                            if (!TextUtils.isEmpty(vote))
                                 programDetail.setVote(Float.parseFloat(vote));
                         } else if (parser.getName().equals("bkid")) {
                             eventType = parser.next();
@@ -124,37 +124,37 @@ public class ProgramDetailParser {
                             eventType = parser.next();
                             String multi = parser.getText();
                             XLog.d(TAG, "<multi>" + multi + "</multi>");
-                            if (!XStringUtil.isNullOrEmpty(multi))
+                            if (!TextUtils.isEmpty(multi))
                                 programDetail.setFilm(multi.equals("1"));
                         } else if (parser.getName().equals("vip")) {
                             eventType = parser.next();
                             String vip = parser.getText();
                             XLog.d(TAG, "<vip>" + vip + "</vip>");
-                            if (!XStringUtil.isNullOrEmpty(vip))
+                            if (!TextUtils.isEmpty(vip))
                                 programDetail.setVipLevel(Integer.parseInt(vip));
                         } else if (parser.getName().equals("vopt")) {
                             eventType = parser.next();
                             String vopt = parser.getText();
                             XLog.d(TAG, "<vopt>" + vopt + "</vopt>");
-                            if (!XStringUtil.isNullOrEmpty(vopt))
+                            if (!TextUtils.isEmpty(vopt))
                                 programDetail.setVipVisibilityLevel(Integer.parseInt(vopt));
                         } else if (parser.getName().equals("popt")) {
                             eventType = parser.next();
                             String popt = parser.getText();
                             XLog.d(TAG, "<popt>" + popt + "</popt>");
-                            if (!XStringUtil.isNullOrEmpty(popt))
+                            if (!TextUtils.isEmpty(popt))
                                 programDetail.setUserRequiredLevel(Integer.parseInt(popt));
                         } else if (parser.getName().equals("vlevel")) {
                             eventType = parser.next();
                             String vlevel = parser.getText();
                             XLog.d(TAG, "<vlevel>" + vlevel + "</vlevel>");
-                            if (!XStringUtil.isNullOrEmpty(vlevel))
+                            if (!TextUtils.isEmpty(vlevel))
                                 programDetail.setOnlineLevel(Integer.parseInt(vlevel));
                         } else if (parser.getName().equals("ct")) {
                             eventType = parser.next();
                             String ct = parser.getText();
                             XLog.d(TAG, "<ct>" + ct + "</ct>");
-                            if (!XStringUtil.isNullOrEmpty(ct))
+                            if (!TextUtils.isEmpty(ct))
                                 programDetail.setProgramLength(Integer.parseInt(ct));
                         } else if (parser.getName().equals("img")) {
                             eventType = parser.next();
@@ -165,13 +165,13 @@ public class ProgramDetailParser {
                             eventType = parser.next();
                             String followable = parser.getText();
                             XLog.d(TAG, "<followable>" + followable + "</followable>");
-                            if (!XStringUtil.isNullOrEmpty(followable))
+                            if (!TextUtils.isEmpty(followable))
                                 programDetail.setFollowable(followable.equals("1"));
                         } else if (parser.getName().equals("fn")) {
                             eventType = parser.next();
                             String fn = parser.getText();
                             XLog.d(TAG, "<fn>" + fn + "</fn>");
-                            if (!XStringUtil.isNullOrEmpty(fn))
+                            if (!TextUtils.isEmpty(fn))
                                 programDetail.setEntertainment(fn.equals("1"));
                         }
                         // 剧集列表
@@ -200,19 +200,19 @@ public class ProgramDetailParser {
                             episode.setUrl(lang);
                             String fsize = parser.getAttributeValue(null, "fsize");
                             XLog.d(TAG, "     fsize=" + fsize);
-                            if (!XStringUtil.isNullOrEmpty(fsize))
+                            if (!TextUtils.isEmpty(fsize))
                                 episode.setFileSize(Long.parseLong(fsize));
                             String dl = parser.getAttributeValue(null, "dl");
                             XLog.d(TAG, "     dl=" + dl);
-                            if (!XStringUtil.isNullOrEmpty(dl))
+                            if (!TextUtils.isEmpty(dl))
                                 episode.setCanDownload(dl.equals("1"));
                             String tm = parser.getAttributeValue(null, "tm");
                             XLog.d(TAG, "     tm=" + tm);
-                            if (!XStringUtil.isNullOrEmpty(tm))
+                            if (!TextUtils.isEmpty(tm))
                                 episode.setTime(Long.parseLong(tm));
                             String ct = parser.getAttributeValue(null, "ct");
                             XLog.d(TAG, "     ct=" + ct);
-                            if (!XStringUtil.isNullOrEmpty(ct))
+                            if (!TextUtils.isEmpty(ct))
                                 episode.setLength(Integer.parseInt(ct));
                             String fmt = parser.getAttributeValue(null, "fmt");
                             XLog.d(TAG, "     fmt=" + fmt);
@@ -222,14 +222,14 @@ public class ProgramDetailParser {
                             episode.setUrl(def);
                             String bitrate = parser.getAttributeValue(null, "bitrate");
                             XLog.d(TAG, "     bitrate=" + bitrate);
-                            if (!XStringUtil.isNullOrEmpty(bitrate))
+                            if (!TextUtils.isEmpty(bitrate))
                                 episode.setBitrate(Integer.parseInt(bitrate));
                             String aid = parser.getAttributeValue(null, "aid");
                             XLog.d(TAG, "     aid=" + aid);
                             episode.setFormat(aid);
                             String type = parser.getAttributeValue(null, "type");
                             XLog.d(TAG, "     type=" + type);
-                            if (!XStringUtil.isNullOrEmpty(type))
+                            if (!TextUtils.isEmpty(type))
                                 episode.setTrailer(type.equals("预告花絮"));
                             String tag = parser.getAttributeValue(null, "tag");
                             XLog.d(TAG, "     tag=" + tag);
@@ -245,21 +245,21 @@ public class ProgramDetailParser {
                             episode.setVseg(vseg);
                             String webURL = parser.getAttributeValue(null, "webURL");
                             XLog.d(TAG, "     webURL=" + webURL);
-                            if (!XStringUtil.isNullOrEmpty(webURL))
+                            if (!TextUtils.isEmpty(webURL))
                                 episode.setWebUrl(webURL);
                             String webUrl = parser.getAttributeValue(null, "webUrl");
                             XLog.d(TAG, "     webUrl=" + webUrl);
-                            if (!XStringUtil.isNullOrEmpty(webUrl))
+                            if (!TextUtils.isEmpty(webUrl))
                                 episode.setWebUrl(webUrl);
                             String pfv2mp4 = parser.getAttributeValue(null, "pfv2mp4");
                             XLog.d(TAG, "     pfv2mp4=" + pfv2mp4);
-                            if (!XStringUtil.isNullOrEmpty(pfv2mp4))
+                            if (!TextUtils.isEmpty(pfv2mp4))
                                 episode.setPfv2mp4(pfv2mp4.equals("1"));
 
                             eventType = parser.next();
                             String episodeName = parser.getText();
                             XLog.d(TAG, "<Channel>" + episodeName + "</Channel>");
-                            if (!XStringUtil.isNullOrEmpty(episodeName))
+                            if (!TextUtils.isEmpty(episodeName))
                                 episode.setName(episodeName);
                         }
                         // 第三方相关信息
@@ -280,7 +280,7 @@ public class ProgramDetailParser {
                             thirdPart.setThirdPartImage(partImage);
                             String fn = parser.getAttributeValue(null, "fn");
                             XLog.d(TAG, "<fn>" + fn + "</fn>");
-                            if (!XStringUtil.isNullOrEmpty(fn))
+                            if (!TextUtils.isEmpty(fn))
                                 thirdPart.setThirdPartIsEntertainment(fn.equals("1"));
                         }
                         // 平台列表

@@ -1,9 +1,9 @@
 package tv.pps.tj.ppsdemo.logic;
 
 import android.content.Context;
+import android.text.TextUtils;
 import com.xengine.android.data.cache.DefaultDataRepo;
 import com.xengine.android.system.file.XAndroidFileMgr;
-import com.xengine.android.utils.XStringUtil;
 import tv.pps.tj.ppsdemo.data.cache.GlobalStateSource;
 import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
 import tv.pps.tj.ppsdemo.data.cache.ProgramDetailSource;
@@ -67,7 +67,7 @@ public class ProgramMgr {
         long programListTimeStamp = mGlobalStateSource.getProgramListXmlUpdateTimeStamp();
         String programListXmlFileName = mGlobalStateSource.getProgramListXmlFileName();
         if (System.currentTimeMillis() - programListTimeStamp < REFRESH_INTERVAL
-                && !XStringUtil.isNullOrEmpty(programListXmlFileName)) {
+                && !TextUtils.isEmpty(programListXmlFileName)) {
             // 如果内存数据源中有数据，则返回数据源的数据
             if (mProgramBaseSource.size() != 0) {
                 return true;

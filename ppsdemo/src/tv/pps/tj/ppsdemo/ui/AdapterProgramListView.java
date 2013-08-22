@@ -116,7 +116,7 @@ public class AdapterProgramListView extends BaseAdapter
             holder.programScoreView.setTextColor(mContext.getResources().getColor(R.color.orange));
         }
 
-        XLog.d(TAG, "getView() asyncoLoadBitmap. index=" + i);
+        XLog.d(TAG, "getView()" + holder.programImageView + " asyncoLoadBitmap. index=" + i);
         // 异步加载图片
         mImageScrollLoader.asyncLoadBitmap(mContext, programBase.getPosterUrl(),
                 holder.programImageView, XImageProcessor.ImageSize.SCREEN, null);

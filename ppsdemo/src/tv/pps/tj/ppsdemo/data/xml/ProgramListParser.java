@@ -1,8 +1,8 @@
 package tv.pps.tj.ppsdemo.data.xml;
 
+import android.text.TextUtils;
 import android.util.Xml;
 import com.xengine.android.data.cache.DefaultDataRepo;
-import com.xengine.android.utils.XStringUtil;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import tv.pps.tj.ppsdemo.data.cache.GlobalStateSource;
@@ -58,37 +58,37 @@ public class ProgramListParser {
                             String bkid = parser.getAttributeValue(null, "bkid");
                             programBase.setBkId(bkid);
                             String vm = parser.getAttributeValue(null, "vm");
-                            if (!XStringUtil.isNullOrEmpty(vm))
+                            if (!TextUtils.isEmpty(vm))
                                 programBase.setVote(Float.parseFloat(vm));
                             String img = parser.getAttributeValue(null, "img");
                             programBase.setPosterUrl(img);
                             String lt = parser.getAttributeValue(null, "lt");
                             programBase.setFirstLetter(lt);
                             String nt = parser.getAttributeValue(null, "nt");
-                            if (!XStringUtil.isNullOrEmpty(nt))
+                            if (!TextUtils.isEmpty(nt))
                                 programBase.setNt(Integer.parseInt(nt));
                             String multi = parser.getAttributeValue(null, "multi");
                             programBase.setFilm("1".equals(multi));
                             String sc = parser.getAttributeValue(null, "sc");
-                            if (!XStringUtil.isNullOrEmpty(sc))
+                            if (!TextUtils.isEmpty(sc))
                                 programBase.setVideoNumber(Integer.parseInt(sc));
                             String on = parser.getAttributeValue(null, "on");
-                            if (!XStringUtil.isNullOrEmpty(on))
+                            if (!TextUtils.isEmpty(on))
                                 programBase.setOnlineNumber(Integer.parseInt(on));
                             String tm = parser.getAttributeValue(null, "tm");
-                            if (!XStringUtil.isNullOrEmpty(tm))
+                            if (!TextUtils.isEmpty(tm))
                                 programBase.setTime(Long.parseLong(tm));
                             String vip = parser.getAttributeValue(null, "vip");
-                            if (!XStringUtil.isNullOrEmpty(vip))
+                            if (!TextUtils.isEmpty(vip))
                                 programBase.setVipLevel(Integer.parseInt(vip));
                             String vopt = parser.getAttributeValue(null, "vopt");
-                            if (!XStringUtil.isNullOrEmpty(vopt))
+                            if (!TextUtils.isEmpty(vopt))
                                 programBase.setVipVisibilityLevel(Integer.parseInt(vopt));
                             String popt = parser.getAttributeValue(null, "popt");
-                            if (!XStringUtil.isNullOrEmpty(popt))
+                            if (!TextUtils.isEmpty(popt))
                                 programBase.setUserRequiredLevel(Integer.parseInt(popt));
                             String vlevel = parser.getAttributeValue(null, "vlevel");
-                            if (!XStringUtil.isNullOrEmpty(vlevel))
+                            if (!TextUtils.isEmpty(vlevel))
                                 programBase.setOnlineLevel(Integer.parseInt(vlevel));
                             String tp = parser.getAttributeValue(null, "tp");
                             programBase.setType(tp);
@@ -99,22 +99,22 @@ public class ProgramListParser {
                         } else if (parser.getName().equals("bl")) {
                             eventType = parser.next();
                             String bl = parser.getText();
-                            if (!XStringUtil.isNullOrEmpty(bl))
+                            if (!TextUtils.isEmpty(bl))
                                 programBase.setBlackList(bl.split(";"));
                         } else if (parser.getName().equals("wl")) {
                             eventType = parser.next();
                             String wl = parser.getText();
-                            if (!XStringUtil.isNullOrEmpty(wl))
+                            if (!TextUtils.isEmpty(wl))
                                 programBase.setWhiteList(wl.split(";"));
                         } else if (parser.getName().equals("plat_bl")) {
                             eventType = parser.next();
                             String plat_bl = parser.getText();
-                            if (!XStringUtil.isNullOrEmpty(plat_bl))
+                            if (!TextUtils.isEmpty(plat_bl))
                                 programBase.setPlatformBlackList(plat_bl.split(";"));
                         } else if (parser.getName().equals("plat_wl")) {
                             eventType = parser.next();
                             String plat_wl = parser.getText();
-                            if (!XStringUtil.isNullOrEmpty(plat_wl))
+                            if (!TextUtils.isEmpty(plat_wl))
                                 programBase.setPlatformWhiteList(plat_wl.split(";"));
                         } else if (parser.getName().equals("search")) {
                             String pt = parser.getAttributeValue(null, "pt");

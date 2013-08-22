@@ -124,11 +124,7 @@ public class SystemMgr {
         XAndroidFileMgr.getInstance().clearDir(XFileMgr.FILE_TYPE_PHOTO);
 
         // clear Mgr
-//        LoginMgr.clearInstance();
-//        BbsArticleMgr.clearInstance();
-//        BbsBoardMgr.clearInstance();
-//        BbsMailMgr.clearInstance();
-//        BbsPersonMgr.clearInstance();
+        ProgramMgr.clearInstance();
 
         // clear DataSource
         DefaultDataRepo.clearInstance();

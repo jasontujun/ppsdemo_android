@@ -102,9 +102,9 @@ public class FragmentContainer extends Fragment {
             }
             if (fragment != null)
                 getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .commit();
+                        .beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commit();
         }
     }
 
@@ -115,6 +115,8 @@ public class FragmentContainer extends Fragment {
     public void addFragment(Fragment fragment) {
         getFragmentManager()
                 .beginTransaction()
+                .setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left,
+                        R.anim.in_from_left, R.anim.out_to_right)
                 .add(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,6 @@ import com.xengine.android.data.cache.DefaultDataRepo;
 import com.xengine.android.data.cache.filter.XBaseFilter;
 import com.xengine.android.media.graphics.XScreen;
 import com.xengine.android.utils.XLog;
-import com.xengine.android.utils.XStringUtil;
 import tv.pps.tj.ppsdemo.R;
 import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
 import tv.pps.tj.ppsdemo.data.cache.SourceName;
@@ -179,7 +179,7 @@ public class FragmentChannel extends Fragment {
                 String s = mSearchInput.getText().toString();
                 mFilter.setInput(s);
                 mProgramBaseSource.doFilter();
-                if (!XStringUtil.isNullOrEmpty(s)) {
+                if (!TextUtils.isEmpty(s)) {
                     mClearInputBtn.setVisibility(View.VISIBLE);
                 } else {
                     mClearInputBtn.setVisibility(View.GONE);
@@ -472,18 +472,18 @@ public class FragmentChannel extends Fragment {
      * 刷新过滤条件栏
      */
     private void refreshFilterFrame() {
-        if (XStringUtil.isNullOrEmpty(mFilter.getFilterType()) &&
-                XStringUtil.isNullOrEmpty(mFilter.getFilterYear()) &&
-                XStringUtil.isNullOrEmpty(mFilter.getFilterFirstLetter())) {
+        if (TextUtils.isEmpty(mFilter.getFilterType()) &&
+                TextUtils.isEmpty(mFilter.getFilterYear()) &&
+                TextUtils.isEmpty(mFilter.getFilterFirstLetter())) {
             mFilterFrame.setVisibility(View.GONE);
             mFilterBtn.setBackgroundResource(R.drawable.bkg_title_words);
         } else {
             mFilterFrame.removeAllViews();
-            if (!XStringUtil.isNullOrEmpty(mFilter.getFilterType()))
+            if (!TextUtils.isEmpty(mFilter.getFilterType()))
                 addItemToFilterFrame(0, mFilter.getFilterType());
-            if (!XStringUtil.isNullOrEmpty(mFilter.getFilterYear()))
+            if (!TextUtils.isEmpty(mFilter.getFilterYear()))
                 addItemToFilterFrame(1, mFilter.getFilterYear());
-            if (!XStringUtil.isNullOrEmpty(mFilter.getFilterFirstLetter()))
+            if (!TextUtils.isEmpty(mFilter.getFilterFirstLetter()))
                 addItemToFilterFrame(2, mFilter.getFilterFirstLetter());
             mFilterFrame.setVisibility(View.VISIBLE);
             mFilterBtn.setBackgroundResource(R.drawable.bkg_title_words_red);
@@ -611,27 +611,27 @@ public class FragmentChannel extends Fragment {
 
         @Override
         public ProgramBase doFilter(ProgramBase programBase) {
-            if (!XStringUtil.isNullOrEmpty(mInput)) {
+            if (!TextUtils.isEmpty(mInput)) {
                 if (!programBase.getName().contains(mInput))
                     return null;
             }
-            if (!XStringUtil.isNullOrEmpty(mFilterType)) {
+            if (!TextUtils.isEmpty(mFilterType)) {
                 String programType = programBase.getSearchProgramType();
-                if (XStringUtil.isNullOrEmpty(programType)) // 如果没有searchType，则用type属性
+                if (TextUtils.isEmpty(programType)) // 如果没有searchType，则用type属性
                     programType = programBase.getType();
-                if (XStringUtil.isNullOrEmpty(programType))
+                if (TextUtils.isEmpty(programType))
                     return null;
                 if (!programType.contains(mFilterType))
                     return null;
             }
-            if (!XStringUtil.isNullOrEmpty(mFilterYear)) {
+            if (!TextUtils.isEmpty(mFilterYear)) {
                 String programYear = programBase.getSearchProgramYear();
-                if (XStringUtil.isNullOrEmpty(programYear))
+                if (TextUtils.isEmpty(programYear))
                     return null;
                 if (!programYear.equals(mFilterYear))
                     return null;
             }
-            if (!XStringUtil.isNullOrEmpty(mFilterFirstLetter)) {
+            if (!TextUtils.isEmpty(mFilterFirstLetter)) {
                 if (!programBase.getFirstLetter().equals(mFilterFirstLetter))
                     return null;
             }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.xengine.android.media.graphics.XScreen;
 import com.xengine.android.media.image.processor.XImageProcessor;
-import com.xengine.android.utils.XStringUtil;
 import tv.pps.tj.ppsdemo.R;
 import tv.pps.tj.ppsdemo.data.model.ProgramDetail;
 import tv.pps.tj.ppsdemo.data.model.ThirdPart;
@@ -219,8 +219,12 @@ public class FragmentProgram extends Fragment {
         mProgramTypeView.setText(mProgramDetail.getType());
         addPeopleItemToLinearFrame(mProgramDetail.getDirector(), mProgramDirectorFrame);
         String[] actors = mProgramDetail.getActor();
-        for (String actor : actors)
-            addPeopleItemToLinearFrame(actor, mProgramActorFrame);
+        if (actors != null) {
+            for (String actor : actors)
+                addPeopleItemToLinearFrame(actor, mProgramActorFrame);
+        } else {
+            addPeopleItemToLinearFrame(null, mProgramActorFrame);
+        }
         mProgramScore.setText("" + mProgramDetail.getVote());
         mProgramBriefView.setText(mProgramDetail.getIntroduction());
         // 初始化播放来源
@@ -289,7 +293,7 @@ public class FragmentProgram extends Fragment {
         peopleView.setTextSize(14);// sp
         peopleView.setTextColor(getActivity().getResources().getColor(R.color.dark_blue));
         peopleView.setBackgroundResource(R.drawable.bg_transparent_black);
-        if (!XStringUtil.isNullOrEmpty(people)) {
+        if (!TextUtils.isEmpty(people)) {
             peopleView.setText(people);
             peopleView.setOnClickListener(new PeopleClickListener(people));// 添加监听
         } else {
