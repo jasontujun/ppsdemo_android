@@ -282,6 +282,7 @@
                         android:layout_height="wrap_content"
                         android:padding="10dp"
                         android:numColumns="auto_fit"
+                        android:columnWidth="80dp"
                         android:verticalSpacing="10dp"
                         android:background="@drawable/ic_third_gridview"
                         android:visibility="gone"/>

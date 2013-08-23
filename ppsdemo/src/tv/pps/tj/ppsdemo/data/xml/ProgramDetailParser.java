@@ -226,7 +226,7 @@ public class ProgramDetailParser {
                                 episode.setBitrate(Integer.parseInt(bitrate));
                             String aid = parser.getAttributeValue(null, "aid");
                             XLog.d(TAG, "     aid=" + aid);
-                            episode.setFormat(aid);
+                            episode.setAid(aid);
                             String type = parser.getAttributeValue(null, "type");
                             XLog.d(TAG, "     type=" + type);
                             if (!TextUtils.isEmpty(type))

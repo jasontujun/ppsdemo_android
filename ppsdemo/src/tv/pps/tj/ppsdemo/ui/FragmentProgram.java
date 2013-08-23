@@ -238,15 +238,19 @@ public class FragmentProgram extends Fragment {
             mSrcGridView.setAdapter(new SourceAdapter(getActivity(),
                     mProgramDetail.getThirdPartList()));
             mSelectedSrcIndex = 0;
-            mThirdPartAdapters = new ArrayList<AdapterEpisode>();
-
-            for (ThirdPart thirdPart : mProgramDetail.getThirdPartList())
-                mThirdPartAdapters.add(
-                        new AdapterEpisode(getActivity(),
-                                thirdPart.getThirdPartEpisodes()));
+            // 初始化第三方来源的adpater
+            if (mThirdPartAdapters == null) {
+                mThirdPartAdapters = new ArrayList<AdapterEpisode>();
+                for (ThirdPart thirdPart : mProgramDetail.getThirdPartList())
+                    mThirdPartAdapters.add(
+                            new AdapterEpisode(getActivity(),
+                                    thirdPart.getThirdPartEpisodes()));
+            }
         }
-        mPpsAdapter = new AdapterEpisode(getActivity(),
-                mProgramDetail.getPpsEpisodes());
+        // 初始化pps来源的初始化
+        if (mPpsAdapter == null)
+            mPpsAdapter = new AdapterEpisode(getActivity(),
+                    mProgramDetail.getPpsEpisodes());
 
         // 初始化剧集
         refreshEpisode();
@@ -260,7 +264,9 @@ public class FragmentProgram extends Fragment {
             return;
 
         AdapterEpisode adapter = null;
-        if (mSelectedSrcIndex == -1) {
+        if (mSelectedSrcIndex == -1) {// PPS来源
+            // 来源按钮
+            mSrcIconView.setImageResource(R.drawable.ic_third_pps);
             // 下载按钮
             mDownloadBtn.setClickable(true);
             mDownloadBtnIcon.setImageResource(R.drawable.details_download_imageview);
@@ -268,7 +274,13 @@ public class FragmentProgram extends Fragment {
             // 初始化剧集
             adapter = mPpsAdapter;
             mEpisodeGridView.setAdapter(adapter);
-        } else {
+        } else {// 第三方来源
+            // 来源按钮
+            String thirdPartImage = mProgramDetail.getThirdPartList().
+                    get(mSelectedSrcIndex).getThirdPartImage();
+            MyImageViewRemoteLoader.getInstance().asyncLoadBitmap(getActivity(),
+                    thirdPartImage, mSrcIconView,
+                    XImageProcessor.ImageSize.SMALL, null);
             // 下载按钮
             mDownloadBtn.setClickable(false);
             mDownloadBtnIcon.setImageResource(R.drawable.details_download_gray_imageview);
@@ -277,16 +289,25 @@ public class FragmentProgram extends Fragment {
             adapter = mThirdPartAdapters.get(mSelectedSrcIndex);
             mEpisodeGridView.setAdapter(adapter);
         }
-        if (adapter.getSelectedTab().equals("预告花絮"))
-            mEpisodeGridView.setNumColumns(1);
-        else
+        // 根据内容字数，设置GridView的列数
+        int itemLength = adapter.getItemLength();
+        if (itemLength <= 2)
             mEpisodeGridView.setNumColumns(5);
+        else if (itemLength <= 5)
+            mEpisodeGridView.setNumColumns(4);
+        else
+            mEpisodeGridView.setNumColumns(1);
         // TODO 初始化标签栏
         mTabAdapter = new EpisodeTabViewPagerAdapter(getActivity(), adapter);
         mEpisodeTabFrame.setAdapter(mTabAdapter);
         mEpisodeTabFrame.setCurrentItem(mTabAdapter.getSelectedIndex());
     }
 
+    /**
+     * 添加人名到演员栏或导演栏
+     * @param people
+     * @param frame
+     */
     private void addPeopleItemToLinearFrame(String people, LinearLayout frame) {
         XScreen screen = ScreenHolder.getInstance();
         TextView peopleView = new TextView(getActivity());
@@ -404,7 +425,7 @@ public class FragmentProgram extends Fragment {
         public View getView(final int i, View convertView, ViewGroup viewGroup) {
             ViewHolder holder = null;
             if (convertView == null) {
-                convertView = View.inflate(mContext, R.layout.program_thirdpart_item, null);
+                convertView = View.inflate(mContext, R.layout.program_src_item, null);
                 holder = new ViewHolder();
                 holder.srcIconView = (ImageView) convertView.findViewById(R.id.thirdpart_icon);
                 holder.srcNameView = (TextView) convertView.findViewById(R.id.thirdpart_name);
@@ -426,7 +447,7 @@ public class FragmentProgram extends Fragment {
                                 thirdPart.getThirdPartImage(), mSrcIconView,
                                 XImageProcessor.ImageSize.SMALL, null);
                         mSrcBtn.performClick();// 收起
-                        // TODO 切换到当前资源下剧集列表
+                        // 切换到当前资源下剧集列表
                         mSelectedSrcIndex = i;
                         refreshEpisode();
                     }
@@ -439,7 +460,7 @@ public class FragmentProgram extends Fragment {
                     public void onClick(View view) {
                         mSrcIconView.setImageResource(R.drawable.ic_third_pps);
                         mSrcBtn.performClick();// 收起
-                        // TODO 切换到当前资源下剧集列表
+                        // 切换到当前资源下剧集列表
                         mSelectedSrcIndex = -1;
                         refreshEpisode();
                     }

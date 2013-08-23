@@ -1,6 +1,7 @@
 package tv.pps.tj.ppsdemo.ui;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,10 @@ import java.util.*;
 public class AdapterEpisode extends BaseAdapter {
     private Context mContext;
 
-    private Map<String, WrapperData> mAllTypeEpisodes;
+    private Map<String, WrapperData> mAllTypeEpisodes;// 所有类别的剧集
     private String mSelectedTab;// 选中的Tab
 
+    // 数据包装类，将一种类别的剧集和升降标识封装在一起
     private class WrapperData {
         public List<Episode> episodes;// 剧集数据
         public boolean isAscending;// 是否升序排列
@@ -80,6 +82,18 @@ public class AdapterEpisode extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    /**
+     * 返回当前标签下，每一个item的字符串长度
+     * @return
+     */
+    public int getItemLength() {
+        Episode episode = (Episode) getItem(0);
+        if (episode != null)
+            return episode.getName().length();
+        else
+            return 0;
+    }
+
     @Override
     public int getCount() {
         WrapperData wrapperData = mAllTypeEpisodes.get(mSelectedTab);
@@ -124,7 +138,10 @@ public class AdapterEpisode extends BaseAdapter {
             return null;
 
         final Episode episode = (Episode) getItem(i);
-        if ("rm".equals(episode.getFormat())) {
+        if (TextUtils.isEmpty(episode.getFormat())) {
+            holder.episodeTypeView.setVisibility(View.GONE);
+        } else if ("rm".equals(episode.getFormat().toLowerCase()) ||
+                "rmvb".equals(episode.getFormat().toLowerCase())) {
             holder.episodeTypeView.setVisibility(View.VISIBLE);
             holder.episodeTypeView.setImageResource(R.drawable.ic_ss_rm);
         } else if ("wmv".equals(episode.getFormat())) {
@@ -134,13 +151,11 @@ public class AdapterEpisode extends BaseAdapter {
             holder.episodeTypeView.setVisibility(View.GONE);
         }
         holder.episodeNameView.setText(episode.getName());
-        if ("预告花絮".equals(mSelectedTab)) {
-            // 如果是预告花絮，则左对齐
+        // 根据内容字数，设置item的对齐方式
+        if (getItemLength() > 5) // 如果是预告花絮等字数较多的，则左对齐
             holder.episodeNameView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-        } else {
-            // 如果是国语高清或国语普通，则居中
+        else // 如果是国语高清或国语普通等字数较少的，则居中
             holder.episodeNameView.setGravity(Gravity.CENTER);
-        }
         holder.episodeNameView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
