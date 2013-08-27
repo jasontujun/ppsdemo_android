@@ -57,7 +57,7 @@ public class ProgramAPI {
             return StatusCode.HTTP_EXCEPTION;// 下载失败
 
         List<File> zipFileList = ZipUtil.getFileList(zip.getAbsolutePath(), false, true);
-        if (zipFileList.size() == 0)
+        if (zipFileList == null || zipFileList.size() == 0)
             return StatusCode.LOCAL_FILE_ERROR;// zip文件不合法
         // 获取目标xml文件名
         File xmlInZip = zipFileList.get(0);// 默认zip里只有一个xml

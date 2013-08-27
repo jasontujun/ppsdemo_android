@@ -33,4 +33,11 @@
         <attr name="footerTriangleHeight" format="dimension" />
         <attr name="customTypeface" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="AlphabetView">
+        <attr name="selectedLetterColor" format="color"/>
+        <attr name="letterColor" format="color"/>
+        <attr name="letterSize" format="dimension"/>
+        <attr name="pressTip" format="reference"/>
+    </declare-styleable>
 </resources>

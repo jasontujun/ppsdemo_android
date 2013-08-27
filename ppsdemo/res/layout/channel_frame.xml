@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res/tv.pps.tj.ppsdemo"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -178,28 +179,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:weightSum="4"
             android:background="@color/light_gray">
         <ImageView
-                android:id="@+id/tab_tip1"
-                android:layout_width="fill_parent"
-                android:layout_height="3dp"
-                android:layout_weight="1"
-                android:src="@color/orange"/>
-        <ImageView
-                android:id="@+id/tab_tip2"
-                android:layout_width="fill_parent"
-                android:layout_height="3dp"
-                android:layout_weight="1"
-                android:src="@color/orange"/>
-        <ImageView
-                android:id="@+id/tab_tip3"
-                android:layout_width="fill_parent"
-                android:layout_height="3dp"
-                android:layout_weight="1"
-                android:src="@color/orange"/>
-        <ImageView
-                android:id="@+id/tab_tip4"
-                android:layout_width="fill_parent"
+                android:id="@+id/tab_tip"
+                android:layout_width="wrap_content"
                 android:layout_height="3dp"
                 android:layout_weight="1"
                 android:src="@color/orange"/>
@@ -220,20 +204,67 @@
             android:id="@+id/content_list_grid_frame"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
-        <!--style="@style/gridview"-->
-        <GridView
-                style="@style/gridview"
-                android:id="@+id/program_gridview"
+        <!--gridview模式-->
+        <RelativeLayout
+                android:id="@+id/program_gridview_frame"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:numColumns="3"/>
-        <!--style="@style/listview"-->
-        <ListView
-                style="@style/listview"
-                android:id="@+id/program_listview"
+                android:layout_height="fill_parent">
+            <!--style="@style/gridview"-->
+            <GridView
+                    style="@style/gridview"
+                    android:id="@+id/program_gridview"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:numColumns="3"/>
+            <tv.pps.tj.ppsdemo.ui.controls.AlphabetView
+                    android:id="@+id/program_gridview_letters"
+                    android:layout_width="20dp"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentRight="true"
+                    app:selectedLetterColor="@color/dark_orange"
+                    app:letterColor="@color/dark_gray"
+                    app:letterSize="10sp"
+                    android:background="@drawable/bg_transparent_gray"/>
+        </RelativeLayout>
+        <!--listview模式-->
+        <RelativeLayout
+                android:id="@+id/program_listview_frame"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:divider="@drawable/list_line_gray"
-                android:dividerHeight="0.5dp"/>
+                android:layout_height="fill_parent">
+            <!--style="@style/listview"-->
+            <ListView
+                    style="@style/listview"
+                    android:id="@+id/program_listview"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:divider="@drawable/list_line_gray"
+                    android:dividerHeight="0.5dp"/>
+            <tv.pps.tj.ppsdemo.ui.controls.AlphabetView
+                    android:id="@+id/program_listview_letters"
+                    android:layout_width="20dp"
+                    android:layout_height="fill_parent"
+                    android:layout_alignParentRight="true"
+                    app:selectedLetterColor="@color/dark_orange"
+                    app:letterColor="@color/dark_gray"
+                    app:letterSize="10sp"
+                    android:background="@drawable/bg_transparent_gray"/>
+        </RelativeLayout>
+        <!--当前字母提示-->
+        <RelativeLayout
+                android:id="@+id/letter_tip_frame"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/dialog"
+                android:visibility="gone">
+            <TextView
+                    android:id="@+id/letter_tip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="A"
+                    android:textSize="45sp"
+                    android:textColor="@color/white"/>
+        </RelativeLayout>
     </RelativeLayout>
 </LinearLayout>

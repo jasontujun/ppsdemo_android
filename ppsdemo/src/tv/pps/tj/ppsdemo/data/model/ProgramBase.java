@@ -254,45 +254,71 @@ public class ProgramBase {
     }
 
 
+    public static Comparator<ProgramBase> getHotComparator() {
+        return hotComparator;
+    }
+
+    public static Comparator<ProgramBase> getTimeComparator() {
+        return timeComparator;
+    }
+
     public static Comparator<ProgramBase> getScoreComparator() {
-        return new Comparator<ProgramBase>() {
-            @Override
-            public int compare(ProgramBase programBase, ProgramBase programBase1) {
+        return scoreComparator;
+    }
+
+    public static Comparator<ProgramBase> getLetterComparator() {
+        return letterComparator;
+    }
+
+    /**
+     * 时间比较，最具有区分度的属性。
+     */
+    private static Comparator<ProgramBase> timeComparator = new Comparator<ProgramBase>() {
+        @Override
+        public int compare(ProgramBase programBase, ProgramBase programBase1) {
+            if (programBase1.getTime() != programBase.getTime())
+                return (int) (programBase1.getTime() - programBase.getTime());
+            else {// 如果时间相同，将评分高的优先
                 if (programBase1.getVote() < programBase.getVote())
                     return -1;
                 else if (programBase1.getVote() > programBase.getVote())
                     return 1;
                 else
-                    return (int) (programBase1.getTime() - programBase.getTime());
+                    return 0;
             }
-        };
-    }
+        }
+    };
 
-    public static Comparator<ProgramBase> getHotComparator() {
-        return new Comparator<ProgramBase>() {
-            @Override
-            public int compare(ProgramBase programBase, ProgramBase programBase1) {
+    private static Comparator<ProgramBase> hotComparator = new Comparator<ProgramBase>() {
+        @Override
+        public int compare(ProgramBase programBase, ProgramBase programBase1) {
+            if (programBase1.getOnlineNumber() != programBase.getOnlineNumber())
                 return programBase1.getOnlineNumber() - programBase.getOnlineNumber();
-            }
-        };
-    }
+            else // 如果在线观看人数相同，再比较时间
+                return timeComparator.compare(programBase, programBase1);
+        }
+    };
 
-    public static Comparator<ProgramBase> getTimeComparator() {
-        return new Comparator<ProgramBase>() {
-            @Override
-            public int compare(ProgramBase programBase, ProgramBase programBase1) {
-                return (int) (programBase1.getTime() - programBase.getTime());
-            }
-        };
-    }
+    private static Comparator<ProgramBase> scoreComparator = new Comparator<ProgramBase>() {
+        @Override
+        public int compare(ProgramBase programBase, ProgramBase programBase1) {
+            if (programBase1.getVote() < programBase.getVote())
+                return -1;
+            else if (programBase1.getVote() > programBase.getVote())
+                return 1;
+            else // 如果评分相同，再比较时间
+                return timeComparator.compare(programBase, programBase1);
+        }
+    };
 
-    public static Comparator<ProgramBase> getLetterComparator() {
-        return new Comparator<ProgramBase>() {
-            @Override
-            public int compare(ProgramBase programBase, ProgramBase programBase1) {
+    private static Comparator<ProgramBase> letterComparator = new Comparator<ProgramBase>() {
+        @Override
+        public int compare(ProgramBase programBase, ProgramBase programBase1) {
+            if (programBase.getFirstLetter().charAt(0) != programBase1.getFirstLetter().charAt(0))
                 return programBase.getFirstLetter().charAt(0) -
                         programBase1.getFirstLetter().charAt(0);
-            }
-        };
-    }
+            else // 如果首字母相同，再比较时间
+                return timeComparator.compare(programBase, programBase1);
+        }
+    };
 }

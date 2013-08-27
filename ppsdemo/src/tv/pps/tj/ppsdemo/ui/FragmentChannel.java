@@ -11,6 +11,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.*;
 import com.xengine.android.data.cache.DefaultDataRepo;
 import com.xengine.android.data.cache.filter.XBaseFilter;
@@ -24,6 +26,7 @@ import tv.pps.tj.ppsdemo.engine.MyImageScrollRemoteLoader;
 import tv.pps.tj.ppsdemo.engine.ScreenHolder;
 import tv.pps.tj.ppsdemo.logic.ProgramMgr;
 import tv.pps.tj.ppsdemo.ui.animation.Rotate3dAnimationHelper;
+import tv.pps.tj.ppsdemo.ui.controls.AlphabetView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,13 +58,19 @@ public class FragmentChannel extends Fragment {
     private EditText mSearchInput;
     private Button mClearInputBtn;
     private TextView mTabView1, mTabView2, mTabView3, mTabView4;
-    private ImageView mTabTip1, mTabTip2, mTabTip3, mTabTip4;
+    private ImageView mTabTip;// tab标签提示
     private LinearLayout mFilterFrame;// 过滤栏
     private RelativeLayout mProgramContentFrame;
-    private ListView mProgramListView;// 节目的列表界面
-    private GridView mProgramGridView;// 节目的网格界面
+    private View mProgramListViewFrame;
+    private ListView mProgramListView;// 节目的ListView
+    private AlphabetView mListViewLetters;// ListView的字母列表
+    private View mProgramGridViewFrame;
+    private GridView mProgramGridView;// 节目的GridView
+    private AlphabetView mGridViewLetters;// GridView的字母表
     private AdapterProgramListView mProgramListViewAdapter;
     private AdapterProgramGridView mProgramGridViewAdapter;
+    private View mLetterTipFrame;
+    private TextView mLetterTip;// 当前选中的letter提示框
 
     private View mAllLoadingFrame;// 整个节目加载提示
     private ProgressBar mAllLoadingProgressBar;
@@ -69,6 +78,7 @@ public class FragmentChannel extends Fragment {
 
     private Rotate3dAnimationHelper mRotate3dAnimationHelper;
     private boolean mModeChangeAnimation = false;// 是否正在播放切换动画
+    private boolean mTipMoveAnimation = false;// 是否正在播放切换动画
 
     private int mCurrentMode;//当前显示模式
     private int mSelectedTabIndex;// 选中的标签页码
@@ -92,17 +102,20 @@ public class FragmentChannel extends Fragment {
         mTabView2 = (TextView) rootView.findViewById(R.id.tab_txt2);
         mTabView3 = (TextView) rootView.findViewById(R.id.tab_txt3);
         mTabView4 = (TextView) rootView.findViewById(R.id.tab_txt4);
-        mTabTip1 = (ImageView) rootView.findViewById(R.id.tab_tip1);
-        mTabTip2 = (ImageView) rootView.findViewById(R.id.tab_tip2);
-        mTabTip3 = (ImageView) rootView.findViewById(R.id.tab_tip3);
-        mTabTip4 = (ImageView) rootView.findViewById(R.id.tab_tip4);
+        mTabTip = (ImageView) rootView.findViewById(R.id.tab_tip);
         mFilterFrame = (LinearLayout) rootView.findViewById(R.id.filter_frame);
         mProgramContentFrame = (RelativeLayout) rootView.findViewById(R.id.content_list_grid_frame);
+        mProgramListViewFrame = rootView.findViewById(R.id.program_listview_frame);
         mProgramListView = (ListView) rootView.findViewById(R.id.program_listview);
+        mListViewLetters = (AlphabetView) rootView.findViewById(R.id.program_listview_letters);
+        mProgramGridViewFrame = rootView.findViewById(R.id.program_gridview_frame);
         mProgramGridView = (GridView) rootView.findViewById(R.id.program_gridview);
+        mGridViewLetters = (AlphabetView) rootView.findViewById(R.id.program_gridview_letters);
         mAllLoadingFrame = rootView.findViewById(R.id.all_loading_frame);
         mAllLoadingProgressBar = (ProgressBar) rootView.findViewById(R.id.all_loading_progressbar);
         mAllLoadingTextView = (TextView) rootView.findViewById(R.id.all_loading_txt);
+        mLetterTipFrame = rootView.findViewById(R.id.letter_tip_frame);
+        mLetterTip = (TextView) rootView.findViewById(R.id.letter_tip);
 
         // 初始化监听
         mMenuBtn.setOnClickListener(mMenuBtnListener);  // 设置菜单按钮的监听
@@ -132,37 +145,33 @@ public class FragmentChannel extends Fragment {
         mTabView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mSelectedTabIndex == 0)
+                if (mSelectedTabIndex == 0 || mTipMoveAnimation)
                     return;
-                mSelectedTabIndex = 0;
-                refreshTabAndView();
+                showTabTipAnimation(mTabTip, mSelectedTabIndex, 0);
             }
         });
         mTabView2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mSelectedTabIndex == 1)
+                if (mSelectedTabIndex == 1 || mTipMoveAnimation)
                     return;
-                mSelectedTabIndex = 1;
-                refreshTabAndView();
+                showTabTipAnimation(mTabTip, mSelectedTabIndex, 1);
             }
         });
         mTabView3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mSelectedTabIndex == 2)
+                if (mSelectedTabIndex == 2 || mTipMoveAnimation)
                     return;
-                mSelectedTabIndex = 2;
-                refreshTabAndView();
+                showTabTipAnimation(mTabTip, mSelectedTabIndex, 2);
             }
         });
         mTabView4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mSelectedTabIndex == 3)
+                if (mSelectedTabIndex == 3 || mTipMoveAnimation)
                     return;
-                mSelectedTabIndex = 3;
-                refreshTabAndView();
+                showTabTipAnimation(mTabTip, mSelectedTabIndex, 3);
             }
         });
 
@@ -190,7 +199,7 @@ public class FragmentChannel extends Fragment {
 
         // 初始化3d翻转动画
         mRotate3dAnimationHelper = new Rotate3dAnimationHelper
-                (mProgramContentFrame, mProgramListView, mProgramGridView);
+                (mProgramContentFrame, mProgramListViewFrame, mProgramGridViewFrame);
         mRotate3dAnimationHelper.setListener(new Rotate3dAnimationHelper.Rotate3dAnimationListener() {
             @Override
             public void rotateStart(boolean rotateToBack) {
@@ -225,14 +234,58 @@ public class FragmentChannel extends Fragment {
         mFilter = new ProgramBaseFilter();
         mProgramBaseSource.setFilter(mFilter);
 
+        // 初始化字母列表
+        mListViewLetters.setOnLetterChangedListener(new AlphabetView.OnLetterChangedListener() {
+            @Override
+            public void onTouchDown() {
+                mLetterTipFrame.setVisibility(View.VISIBLE);
+            }
+            @Override
+            public void onTouchUp() {
+                mLetterTipFrame.setVisibility(View.INVISIBLE);
+            }
+            @Override
+            public void onTouchLetterChanged(String s) {
+                mLetterTip.setText(s);
+                // 跳转到对应的位置
+                Map<String, Integer> alphaIndexer =  mProgramBaseSource.getAlphaIndexer();
+                if (alphaIndexer != null) {
+                    Integer position = alphaIndexer.get(s);
+                    if (position != null)
+                        mProgramListView.setSelection(position);
+                }
+            }
+        });
+        mGridViewLetters.setOnLetterChangedListener(new AlphabetView.OnLetterChangedListener() {
+            @Override
+            public void onTouchDown() {
+                mLetterTipFrame.setVisibility(View.VISIBLE);
+            }
+            @Override
+            public void onTouchUp() {
+                mLetterTipFrame.setVisibility(View.INVISIBLE);
+            }
+            @Override
+            public void onTouchLetterChanged(String s) {
+                mLetterTip.setText(s);
+                // 跳转到对应的位置
+                Map<String, Integer> alphaIndexer =  mProgramBaseSource.getAlphaIndexer();
+                if (alphaIndexer != null) {
+                    Integer position = alphaIndexer.get(s);
+                    if (position != null)
+                        mProgramGridView.setSelection(position);
+                }
+            }
+        });
+
         // 初始化显示模式(上次用户是列表模式还是网格模式)
         mCurrentMode = getArguments().getInt("mode");// 传进来的参数
         if (mCurrentMode == MODE_LISTVIEW) {
-            mProgramListView.setVisibility(View.VISIBLE);
-            mProgramGridView.setVisibility(View.GONE);
+            mProgramListViewFrame.setVisibility(View.VISIBLE);
+            mProgramGridViewFrame.setVisibility(View.GONE);
         } else {
-            mProgramListView.setVisibility(View.GONE);
-            mProgramGridView.setVisibility(View.VISIBLE);
+            mProgramListViewFrame.setVisibility(View.GONE);
+            mProgramGridViewFrame.setVisibility(View.VISIBLE);
         }
 
         // 初始化标签
@@ -422,6 +475,37 @@ public class FragmentChannel extends Fragment {
     }
 
     /**
+     * 启动tip动画
+     * @param view
+     * @param oldIndex
+     * @param newIndex
+     */
+    private void showTabTipAnimation(final View view, int oldIndex, final int newIndex) {
+        view.clearAnimation();
+        final int itemWidth = ScreenHolder.getInstance().getScreenWidth() / 4;
+        final Animation animation = new TranslateAnimation(oldIndex * itemWidth,
+                newIndex * itemWidth, 0, 0);
+        animation.setFillAfter(true);// True:图片停在动画结束位置
+        animation.setDuration(150);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mTipMoveAnimation = true;
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mSelectedTabIndex = newIndex;
+                refreshTabAndView();
+                mTipMoveAnimation = false;
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+        view.startAnimation(animation);
+    }
+
+    /**
      * 刷新标签栏，以及对应的ListView或GridView
      */
     private void refreshTabAndView() {
@@ -430,38 +514,36 @@ public class FragmentChannel extends Fragment {
         mTabView2.setTextColor(getActivity().getResources().getColor(R.color.black));
         mTabView3.setTextColor(getActivity().getResources().getColor(R.color.black));
         mTabView4.setTextColor(getActivity().getResources().getColor(R.color.black));
-        mTabTip1.setVisibility(View.INVISIBLE);
-        mTabTip2.setVisibility(View.INVISIBLE);
-        mTabTip3.setVisibility(View.INVISIBLE);
-        mTabTip4.setVisibility(View.INVISIBLE);
+        mListViewLetters.setVisibility(View.INVISIBLE);
+        mGridViewLetters.setVisibility(View.INVISIBLE);
         switch (mSelectedTabIndex) {
             case 0:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=0");
-                mProgramBaseSource.sort(ProgramBase.getHotComparator());
                 mTabView1.setTextColor(getActivity().getResources().getColor(R.color.orange));
-                mTabTip1.setVisibility(View.VISIBLE);
+                mProgramBaseSource.sort(ProgramBase.getHotComparator());
                 break;
             case 1:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=1");
-                mProgramBaseSource.sort(ProgramBase.getTimeComparator());
                 mTabView2.setTextColor(getActivity().getResources().getColor(R.color.orange));
-                mTabTip2.setVisibility(View.VISIBLE);
+                mProgramBaseSource.sort(ProgramBase.getTimeComparator());
                 break;
             case 2:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=2");
-                mProgramBaseSource.sort(ProgramBase.getScoreComparator());
                 mTabView3.setTextColor(getActivity().getResources().getColor(R.color.orange));
-                mTabTip3.setVisibility(View.VISIBLE);
+                mProgramBaseSource.sort(ProgramBase.getScoreComparator());
                 break;
             case 3:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
                 XLog.d(TAG, "mProgramBaseSource sort. tab=3");
-                mProgramBaseSource.sort(ProgramBase.getLetterComparator());
                 mTabView4.setTextColor(getActivity().getResources().getColor(R.color.orange));
-                mTabTip4.setVisibility(View.VISIBLE);
+                mProgramBaseSource.sort(ProgramBase.getLetterComparator());
+                mProgramBaseSource.initAlphaIndexer(AlphabetView.ALPHABET);// TIP 初始化映射表
+
+                mListViewLetters.setVisibility(View.VISIBLE);
+                mGridViewLetters.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;

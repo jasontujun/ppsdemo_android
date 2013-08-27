@@ -79,7 +79,8 @@ public class ProgramDetailParser {
                             eventType = parser.next();
                             String dirt = parser.getText();
                             XLog.d(TAG, "<dirt>" + dirt + "</dirt>");
-                            programDetail.setDirector(dirt);
+                            if (!TextUtils.isEmpty(dirt))
+                                programDetail.setDirector(dirt.split(",")[0]);
                         } else if (parser.getName().equals("actor")) {
                             eventType = parser.next();
                             String actors = parser.getText();

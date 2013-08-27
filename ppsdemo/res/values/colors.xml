@@ -19,7 +19,7 @@
     <color name="light_gray">#ffdddddd</color>
     <color name="gray">#ffcdcdcd</color>
     <color name="dark_gray">#ff8c8c8c</color>
-    <color name="light_black">#ff3b3d3d</color>
+    <color name="light_black">#ff363838</color>
     <color name="black">#000000</color>
     <color name="black_translucent">#4e000000</color>
 </resources>

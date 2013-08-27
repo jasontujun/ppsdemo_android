@@ -15,7 +15,7 @@ public class ScreenHolder {
 
     private static Context context;
 
-    private static XScreen mScreen;// 主要的通信线程池
+    private static XScreen mScreen;
 
     /**
      * 请使用getApplicationContext()来初始化

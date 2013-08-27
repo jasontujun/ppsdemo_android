@@ -352,7 +352,7 @@
                 android:layout_height="50dp"
                 android:layout_alignParentBottom="true"
                 android:orientation="horizontal"
-                android:background="@drawable/background_help">
+                android:background="@color/light_black">
             <!--tab1-->
             <LinearLayout
                     android:id="@+id/favour_btn"
