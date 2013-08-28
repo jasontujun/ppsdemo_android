@@ -167,8 +167,8 @@ public class AdapterProgramGridView extends BaseAdapter
     private Handler changeHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == 0) {
-                XLog.d(TAG, "postNotifyDataChange received");
+            if (msg.what == 0) {
+                XLog.d(TAG, "postNotifyDataChange received. GridView");
                 mImageScrollLoader.onIdle();
                 notifyDataSetChanged();
             }

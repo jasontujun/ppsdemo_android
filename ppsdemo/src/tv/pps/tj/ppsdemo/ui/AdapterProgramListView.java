@@ -182,7 +182,7 @@ public class AdapterProgramListView extends BaseAdapter
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 0) {
-                XLog.d(TAG, "postNotifyDataChange received");
+                XLog.d(TAG, "postNotifyDataChange received. ListView");
                 mImageScrollLoader.onIdle();
                 notifyDataSetChanged();
             }
