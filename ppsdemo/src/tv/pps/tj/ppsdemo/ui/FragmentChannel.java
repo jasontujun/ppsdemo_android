@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.*;
@@ -27,6 +28,7 @@ import tv.pps.tj.ppsdemo.engine.ScreenHolder;
 import tv.pps.tj.ppsdemo.logic.ProgramMgr;
 import tv.pps.tj.ppsdemo.ui.animation.Rotate3dAnimationHelper;
 import tv.pps.tj.ppsdemo.ui.controls.AlphabetView;
+import tv.pps.tj.ppsdemo.util.ClickUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,14 +73,17 @@ public class FragmentChannel extends Fragment {
     private AdapterProgramGridView mProgramGridViewAdapter;
     private View mLetterTipFrame;
     private TextView mLetterTip;// 当前选中的letter提示框
+    private Button mListViewTopBtn, mGridViewTopBtn;
+    private TopBtnScrollListener mListViewScrollListener;
+    private TopBtnScrollListener mGridViewScrollListener;
 
     private View mAllLoadingFrame;// 整个节目加载提示
     private ProgressBar mAllLoadingProgressBar;
     private TextView mAllLoadingTextView;
 
     private Rotate3dAnimationHelper mRotate3dAnimationHelper;
-    private boolean mModeChangeAnimation = false;// 是否正在播放切换动画
-    private boolean mTipMoveAnimation = false;// 是否正在播放切换动画
+    private boolean mModeChangeAnimation = false;// 是否正在播放切换模式的动画
+    private boolean mTipMoveAnimation = false;// 是否正在播放切换标签的动画
 
     private int mCurrentMode;//当前显示模式
     private int mSelectedTabIndex;// 选中的标签页码
@@ -116,6 +121,8 @@ public class FragmentChannel extends Fragment {
         mAllLoadingTextView = (TextView) rootView.findViewById(R.id.all_loading_txt);
         mLetterTipFrame = rootView.findViewById(R.id.letter_tip_frame);
         mLetterTip = (TextView) rootView.findViewById(R.id.letter_tip);
+        mListViewTopBtn = (Button) rootView.findViewById(R.id.top_btn_listview);
+        mGridViewTopBtn = (Button) rootView.findViewById(R.id.top_btn_gridview);
 
         // 初始化监听
         mMenuBtn.setOnClickListener(mMenuBtnListener);  // 设置菜单按钮的监听
@@ -174,6 +181,24 @@ public class FragmentChannel extends Fragment {
                 showTabTipAnimation(mTabTip, mSelectedTabIndex, 3);
             }
         });
+        mListViewTopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mProgramListView.isStackFromBottom()) {
+                    mProgramListView.setStackFromBottom(true);
+                }
+                mProgramListView.setStackFromBottom(false);
+            }
+        });
+        mGridViewTopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mProgramGridView.isStackFromBottom()) {
+                    mProgramGridView.setStackFromBottom(true);
+                }
+                mProgramGridView.setStackFromBottom(false);
+            }
+        });
 
         // 初始化搜索栏
         mSearchInput.addTextChangedListener(new TextWatcher() {
@@ -213,7 +238,6 @@ public class FragmentChannel extends Fragment {
                     mCurrentMode = MODE_LISTVIEW;
                     mModeBtn.setImageResource(R.drawable.icon_top_list);
                 }
-
                 mModeChangeAnimation = false;
             }
         });
@@ -221,12 +245,15 @@ public class FragmentChannel extends Fragment {
         // 初始化列表
         mProgramListViewAdapter = new AdapterProgramListView(getActivity());
         mProgramListView.setAdapter(mProgramListViewAdapter);
-        mProgramListView.setOnScrollListener(mProgramListViewAdapter);
         mProgramListView.setOnItemClickListener(new ProgramItemClickListener());
         mProgramGridViewAdapter = new AdapterProgramGridView(getActivity());
         mProgramGridView.setAdapter(mProgramGridViewAdapter);
-        mProgramGridView.setOnScrollListener(mProgramGridViewAdapter);
         mProgramGridView.setOnItemClickListener(new ProgramItemClickListener());
+        // 设置滚动监听
+        mListViewScrollListener = new TopBtnScrollListener(mListViewTopBtn, mProgramListViewAdapter);
+        mGridViewScrollListener = new TopBtnScrollListener(mGridViewTopBtn, mProgramGridViewAdapter);
+        mProgramListView.setOnScrollListener(mListViewScrollListener);
+        mProgramGridView.setOnScrollListener(mGridViewScrollListener);
         // 注册列表对数据源的监听
         mProgramBaseSource.registerDataChangeListener(mProgramListViewAdapter);
         mProgramBaseSource.registerDataChangeListener(mProgramGridViewAdapter);
@@ -505,45 +532,84 @@ public class FragmentChannel extends Fragment {
         view.startAnimation(animation);
     }
 
+    private void showTopBtnAnimation(final View view, final boolean visible) {
+        if (view.getVisibility() == View.VISIBLE && visible)
+            return;
+        if (view.getVisibility() != View.VISIBLE && !visible)
+            return;
+
+        view.clearAnimation();
+        final Animation animation;
+        if (visible)
+            animation = new AlphaAnimation(0f, 1f);
+        else
+            animation = new AlphaAnimation(1f, 0f);
+        animation.setFillAfter(true);// True:图片停在动画结束位置
+        animation.setDuration(100);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (visible)
+                    view.setVisibility(View.VISIBLE);
+                else
+                    view.setVisibility(View.GONE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+        view.startAnimation(animation);
+    }
+
     /**
      * 刷新标签栏，以及对应的ListView或GridView
      */
     private void refreshTabAndView() {
-        XLog.d(TAG, "refreshTabAndView");
         mTabView1.setTextColor(getActivity().getResources().getColor(R.color.black));
         mTabView2.setTextColor(getActivity().getResources().getColor(R.color.black));
         mTabView3.setTextColor(getActivity().getResources().getColor(R.color.black));
         mTabView4.setTextColor(getActivity().getResources().getColor(R.color.black));
-        mListViewLetters.setVisibility(View.INVISIBLE);
-        mGridViewLetters.setVisibility(View.INVISIBLE);
         switch (mSelectedTabIndex) {
             case 0:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
-                XLog.d(TAG, "mProgramBaseSource sort. tab=0");
                 mTabView1.setTextColor(getActivity().getResources().getColor(R.color.orange));
                 mProgramBaseSource.sort(ProgramBase.getHotComparator());
+                mListViewLetters.setVisibility(View.INVISIBLE);
+                mGridViewLetters.setVisibility(View.INVISIBLE);
+                mListViewScrollListener.setCanShow(true);
+                mGridViewScrollListener.setCanShow(true);
                 break;
             case 1:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
-                XLog.d(TAG, "mProgramBaseSource sort. tab=1");
                 mTabView2.setTextColor(getActivity().getResources().getColor(R.color.orange));
                 mProgramBaseSource.sort(ProgramBase.getTimeComparator());
+                mListViewLetters.setVisibility(View.INVISIBLE);
+                mGridViewLetters.setVisibility(View.INVISIBLE);
+                mListViewScrollListener.setCanShow(true);
+                mGridViewScrollListener.setCanShow(true);
                 break;
             case 2:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
-                XLog.d(TAG, "mProgramBaseSource sort. tab=2");
                 mTabView3.setTextColor(getActivity().getResources().getColor(R.color.orange));
                 mProgramBaseSource.sort(ProgramBase.getScoreComparator());
+                mListViewLetters.setVisibility(View.INVISIBLE);
+                mGridViewLetters.setVisibility(View.INVISIBLE);
+                mListViewScrollListener.setCanShow(true);
+                mGridViewScrollListener.setCanShow(true);
                 break;
             case 3:
                 MyImageScrollRemoteLoader.getInstance().stopAndClear();
-                XLog.d(TAG, "mProgramBaseSource sort. tab=3");
                 mTabView4.setTextColor(getActivity().getResources().getColor(R.color.orange));
                 mProgramBaseSource.sort(ProgramBase.getLetterComparator());
-                mProgramBaseSource.initAlphaIndexer(AlphabetView.ALPHABET);// TIP 初始化映射表
 
+                mProgramBaseSource.initAlphaIndexer(AlphabetView.ALPHABET);// TIP 初始化映射表
                 mListViewLetters.setVisibility(View.VISIBLE);
                 mGridViewLetters.setVisibility(View.VISIBLE);
+                mListViewScrollListener.setCanShow(false);
+                mGridViewScrollListener.setCanShow(false);
                 break;
             default:
                 break;
@@ -603,9 +669,15 @@ public class FragmentChannel extends Fragment {
         mFilterFrame.addView(rootView, params);
     }
 
+    /**
+     * 点击ListView或GridView
+     */
     private class ProgramItemClickListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            if (ClickUtil.isFastDoubleClick())
+                return;
+
             ProgramBase programBase = mProgramBaseSource.get(i);
             FragmentProgram programDetail = new FragmentProgram();
             Bundle args = new Bundle();
@@ -616,6 +688,59 @@ public class FragmentChannel extends Fragment {
             ((ActivityMain) getActivity()).addFragment(programDetail);// 跳转详情界面
         }
     }
+
+    private class TopBtnScrollListener implements AbsListView.OnScrollListener {
+        private View mTopBtn;
+        private AbsListView.OnScrollListener mNestedListener;
+
+        private boolean mIsHead;
+        private boolean mCanShow;// 是否显示
+        private int mScrollState;
+
+        private TopBtnScrollListener(View topBtn, AbsListView.OnScrollListener nestedListener) {
+            mTopBtn = topBtn;
+            mNestedListener = nestedListener;
+            mIsHead = false;
+            mCanShow = true;
+        }
+
+        public void setCanShow(boolean enable) {
+            mCanShow = enable;
+
+            if (!mIsHead && mCanShow &&  mScrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
+                showTopBtnAnimation(mTopBtn, true);
+            else
+                showTopBtnAnimation(mTopBtn, false);
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            XLog.d(TAG, "AbsListView onScrollStateChanged()");
+            mNestedListener.onScrollStateChanged(view, scrollState);
+
+            mScrollState = scrollState;
+            if (!mIsHead && mCanShow && mScrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
+                showTopBtnAnimation(mTopBtn, true);
+            else
+                showTopBtnAnimation(mTopBtn, false);
+        }
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem,
+                             int visibleItemCount, int totalItemCount) {
+            XLog.d(TAG, "AbsListView onScroll()");
+            mNestedListener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+
+            View childView = view.getChildAt(0);
+            if (childView != null) {
+                if (firstVisibleItem == 0 && childView.getTop() >= 0) {
+                    mIsHead = true;
+                    showTopBtnAnimation(mTopBtn, false);
+                } else
+                    mIsHead = false;
+            }
+        }
+    }
+
 
     /**
      * 加载列表数据的asyncTask

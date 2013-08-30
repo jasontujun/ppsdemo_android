@@ -173,7 +173,9 @@ public class ProgramDetailParser {
                             String fn = parser.getText();
                             XLog.d(TAG, "<fn>" + fn + "</fn>");
                             if (!TextUtils.isEmpty(fn))
-                                programDetail.setEntertainment(fn.equals("1"));
+                                programDetail.setEntertainment(true);
+                            else
+                                programDetail.setEntertainment(false);
                         }
                         // 剧集列表
                         else if (parser.getName().equals("Channels")) {
@@ -260,8 +262,16 @@ public class ProgramDetailParser {
                             eventType = parser.next();
                             String episodeName = parser.getText();
                             XLog.d(TAG, "<Channel>" + episodeName + "</Channel>");
-                            if (!TextUtils.isEmpty(episodeName))
+                            if (!TextUtils.isEmpty(episodeName)) {
+                                if (TextUtils.isDigitsOnly(episodeName) && episodeName.length() == 6) {
+                                    // 对内容进行优化，如130414转换"13年04月14日-XXXX"
+                                    episodeName = episodeName.substring(0, 2) + "年" +
+                                            episodeName.substring(2, 4) + "月" +
+                                            episodeName.substring(4, 6) + "日" +
+                                            "-" + programDetail.getName();
+                                }
                                 episode.setName(episodeName);
+                            }
                         }
                         // 第三方相关信息
                         else if (parser.getName().equals("ThirdPart")) {
@@ -282,7 +292,9 @@ public class ProgramDetailParser {
                             String fn = parser.getAttributeValue(null, "fn");
                             XLog.d(TAG, "<fn>" + fn + "</fn>");
                             if (!TextUtils.isEmpty(fn))
-                                thirdPart.setThirdPartIsEntertainment(fn.equals("1"));
+                                thirdPart.setThirdPartIsEntertainment(true);
+                            else
+                                thirdPart.setThirdPartIsEntertainment(false);
                         }
                         // 平台列表
                         else if (parser.getName().equals("playType")) {

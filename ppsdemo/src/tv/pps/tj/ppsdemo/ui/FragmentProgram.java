@@ -215,8 +215,14 @@ public class FragmentProgram extends Fragment {
                 mProgramDetail.getPosterUrl(), mProgramImage,
                 XImageProcessor.ImageSize.SCREEN, null);
         // 信息
-        mProgramAreaView.setText(mProgramDetail.getRegion());
-        mProgramTypeView.setText(mProgramDetail.getType());
+        if (TextUtils.isEmpty(mProgramDetail.getRegion()))
+            mProgramAreaView.setText("暂无");
+        else
+            mProgramAreaView.setText(mProgramDetail.getRegion());
+        if (TextUtils.isEmpty(mProgramDetail.getType()))
+            mProgramTypeView.setText("暂无");
+        else
+            mProgramTypeView.setText(mProgramDetail.getType());
         addPeopleItemToLinearFrame(mProgramDetail.getDirector(), mProgramDirectorFrame);
         String[] actors = mProgramDetail.getActor();
         if (actors != null) {
@@ -297,7 +303,7 @@ public class FragmentProgram extends Fragment {
             mEpisodeGridView.setNumColumns(4);
         else
             mEpisodeGridView.setNumColumns(1);
-        // TODO 初始化标签栏
+        // 初始化标签栏
         mTabAdapter = new EpisodeTabViewPagerAdapter(getActivity(), adapter);
         mEpisodeTabFrame.setAdapter(mTabAdapter);
         mEpisodeTabFrame.setCurrentItem(mTabAdapter.getSelectedIndex());

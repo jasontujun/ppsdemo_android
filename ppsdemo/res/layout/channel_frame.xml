@@ -225,6 +225,17 @@
                     app:letterColor="@color/dark_gray"
                     app:letterSize="10sp"
                     android:background="@drawable/bg_transparent_gray"/>
+            <!--回到顶部按钮-->
+            <Button
+                    android:id="@+id/top_btn_gridview"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="40dp"
+                    android:background="@drawable/btn_float_top"
+                    android:visibility="gone"/>
         </RelativeLayout>
         <!--listview模式-->
         <RelativeLayout
@@ -248,6 +259,17 @@
                     app:letterColor="@color/dark_gray"
                     app:letterSize="10sp"
                     android:background="@drawable/bg_transparent_gray"/>
+            <!--回到顶部按钮-->
+            <Button
+                    android:id="@+id/top_btn_listview"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="40dp"
+                    android:background="@drawable/btn_float_top"
+                    android:visibility="gone"/>
         </RelativeLayout>
         <!--当前字母提示-->
         <RelativeLayout
