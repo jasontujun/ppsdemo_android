@@ -7,7 +7,7 @@
     <application android:label="@string/app_name"
                  android:icon="@drawable/icon"
                  android:theme="@style/notitle">
-        <!--城市详情界面-->
+        <!--主界面-->
         <activity android:name=".ui.ActivityMain"
                   android:windowSoftInputMode="adjustPan"
                   android:launchMode="singleTask"

@@ -3,6 +3,7 @@ package tv.pps.tj.ppsdemo.data.cache;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.xengine.android.data.cache.XDataSource;
+import tv.pps.tj.ppsdemo.ui.FragmentChannel;
 
 /**
  * 记录全局都要用到的状态。
@@ -18,6 +19,7 @@ public class GlobalStateSource implements XDataSource {
 
     private SharedPreferences pref;
 
+    private static final String CHANNEL_FRAME_DISPLAY_MODE = "channelFrameDisplayMode";
     private static final String PROGRAM_LIST_XML_TIME_STAMP = "programListXmlTimeStamp";
     private static final String PROGRAM_LIST_XML_FILE_NAME = "programListXmlFileName";
 
@@ -51,6 +53,16 @@ public class GlobalStateSource implements XDataSource {
     public void setProgramListXmlFileName(String fileName) {
         SharedPreferences.Editor editor = pref.edit();
         editor.putString(PROGRAM_LIST_XML_FILE_NAME, fileName);
+        editor.commit();
+    }
+
+    public int getChannelFrameMode() {
+        return pref.getInt(CHANNEL_FRAME_DISPLAY_MODE, FragmentChannel.MODE_LISTVIEW);
+    }
+
+    public void setChannelFrameMode(int mode) {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(CHANNEL_FRAME_DISPLAY_MODE, mode);
         editor.commit();
     }
 }

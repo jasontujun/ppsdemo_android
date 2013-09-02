@@ -1,6 +1,7 @@
 package tv.pps.tj.ppsdemo.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import com.xengine.android.data.cache.filter.XBaseFilter;
 import com.xengine.android.media.graphics.XScreen;
 import com.xengine.android.utils.XLog;
 import tv.pps.tj.ppsdemo.R;
+import tv.pps.tj.ppsdemo.data.cache.GlobalStateSource;
 import tv.pps.tj.ppsdemo.data.cache.ProgramBaseSource;
 import tv.pps.tj.ppsdemo.data.cache.SourceName;
 import tv.pps.tj.ppsdemo.data.model.ProgramBase;
@@ -49,6 +51,7 @@ public class FragmentChannel extends Fragment {
     public static final int MODE_LISTVIEW = 0;// 列表模式
     public static final int MODE_GRIDVIEW = 1;// 网格模式
 
+    GlobalStateSource globalStateSource;
     private ProgramBaseSource mProgramBaseSource;
 
     private ImageView mMenuBtn;
@@ -94,6 +97,7 @@ public class FragmentChannel extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        globalStateSource = (GlobalStateSource) DefaultDataRepo.getInstance().getSource(SourceName.GLOBAL_STATE);
         mProgramBaseSource = (ProgramBaseSource) DefaultDataRepo.getInstance().getSource(SourceName.PROGRAM_BASE);
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.channel_frame, container, false);
@@ -233,16 +237,18 @@ public class FragmentChannel extends Fragment {
             public void rotateFinish(boolean rotateToBack) {
                 if (rotateToBack) {
                     mCurrentMode = MODE_GRIDVIEW;
-                    mModeBtn.setImageResource(R.drawable.icon_top_grid);
+                    mModeBtn.setImageResource(R.drawable.icon_top_list);
                 } else {
                     mCurrentMode = MODE_LISTVIEW;
-                    mModeBtn.setImageResource(R.drawable.icon_top_list);
+                    mModeBtn.setImageResource(R.drawable.icon_top_grid);
                 }
+                globalStateSource.setChannelFrameMode(mCurrentMode);
                 mModeChangeAnimation = false;
             }
         });
 
         // 初始化列表
+        addFooterInListView(getActivity(), mProgramListView);
         mProgramListViewAdapter = new AdapterProgramListView(getActivity());
         mProgramListView.setAdapter(mProgramListViewAdapter);
         mProgramListView.setOnItemClickListener(new ProgramItemClickListener());
@@ -310,9 +316,11 @@ public class FragmentChannel extends Fragment {
         if (mCurrentMode == MODE_LISTVIEW) {
             mProgramListViewFrame.setVisibility(View.VISIBLE);
             mProgramGridViewFrame.setVisibility(View.GONE);
+            mModeBtn.setImageResource(R.drawable.icon_top_grid);
         } else {
             mProgramListViewFrame.setVisibility(View.GONE);
             mProgramGridViewFrame.setVisibility(View.VISIBLE);
+            mModeBtn.setImageResource(R.drawable.icon_top_list);
         }
 
         // 初始化标签
@@ -367,6 +375,11 @@ public class FragmentChannel extends Fragment {
         // 注册列表对数据源的监听
         mProgramBaseSource.unregisterDataChangeListener(mProgramListViewAdapter);
         mProgramBaseSource.unregisterDataChangeListener(mProgramGridViewAdapter);
+    }
+
+    private void addFooterInListView(Context context, ListView listView) {
+        View footer = View.inflate(context, R.layout.program_listview_foot, null);
+        listView.addFooterView(footer, null, false);
     }
 
     /**

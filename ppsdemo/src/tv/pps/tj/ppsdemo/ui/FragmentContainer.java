@@ -5,7 +5,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.xengine.android.data.cache.DefaultDataRepo;
 import tv.pps.tj.ppsdemo.R;
+import tv.pps.tj.ppsdemo.data.cache.GlobalStateSource;
+import tv.pps.tj.ppsdemo.data.cache.SourceName;
 
 /**
  * 应用首页，显示各个频道。
@@ -44,9 +47,12 @@ public class FragmentContainer extends Fragment {
             Bundle args = null;
             switch (mSelectedMenuIndex) {
                 case 0:
+                    GlobalStateSource globalStateSource = (GlobalStateSource) DefaultDataRepo.
+                            getInstance().getSource(SourceName.GLOBAL_STATE);
+                    int mode = globalStateSource.getChannelFrameMode();
                     fragment = new FragmentChannel();
                     args = new Bundle();
-                    args.putInt("mode", FragmentChannel.MODE_LISTVIEW);
+                    args.putInt("mode", mode);
                     args.putString("name", "内地剧场");
                     fragment.setArguments(args);
                     break;

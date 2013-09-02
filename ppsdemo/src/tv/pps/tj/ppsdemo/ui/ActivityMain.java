@@ -1,5 +1,8 @@
 package tv.pps.tj.ppsdemo.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -12,10 +15,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
 import com.xengine.android.media.graphics.XScreen;
-import com.xengine.android.utils.XLog;
 import tv.pps.tj.ppsdemo.R;
 import tv.pps.tj.ppsdemo.engine.ScreenHolder;
 import tv.pps.tj.ppsdemo.logic.SystemMgr;
+import tv.pps.tj.ppsdemo.ui.receiver.NetworkReceiver;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,6 +38,8 @@ public class ActivityMain extends FragmentActivity {
     private FragmentContainer mMiddleContainerFragment;// 中间主界面
 
     private boolean mShowingMenu;// 是否显示左边栏
+
+    private BroadcastReceiver mNetworkReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,13 +69,27 @@ public class ActivityMain extends FragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        if (mNetworkReceiver == null)
+            mNetworkReceiver = new NetworkReceiver();
+
+        // 注册对网络状况的监听
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mNetworkReceiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // 取消对网络状况的监听
+        unregisterReceiver(mNetworkReceiver);
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent e) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                XLog.d("MAIN", "key_back!!");
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                     getSupportFragmentManager().popBackStack();
                     return false;
@@ -89,7 +108,6 @@ public class ActivityMain extends FragmentActivity {
                     return true;
                 }
             case KeyEvent.KEYCODE_MENU:
-                XLog.d("MAIN", "key_menu!!");
                 if (!mShowingMenu)
                     mDragMenu.setCurrentItem(0);
                 else
@@ -119,9 +137,9 @@ public class ActivityMain extends FragmentActivity {
         return new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // 切换成相应的Fragment界面
                 mMiddleContainerFragment.selectMenu(i);
-
-                // TODO 切换成相应的Fragment界面
+                // 收起侧边栏
                 if (mShowingMenu)
                     mDragMenu.setCurrentItem(1);
             }
@@ -130,7 +148,7 @@ public class ActivityMain extends FragmentActivity {
 
 
     /**
-     * 当前主题页面下添加页面
+     * 当前主题页面下添加子页面
      * @param fragment
      */
     public void addFragment(Fragment fragment) {
