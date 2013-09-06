@@ -49,7 +49,7 @@ public class SystemMgr {
         fileMgr.setDir(XFileMgr.FILE_TYPE_PHOTO, "photo", true);
         fileMgr.setDir(DIR_DATA_XML, "data" + File.separator + "xml", false);
         // 初始化网络模块
-        HttpClientHolder.init(context);
+        HttpClientHolder.init(context, "pps");
         DownloadMgrHolder.init(HttpClientHolder.getImageHttpClient(),
                 ScreenHolder.getInstance().getScreenWidth(),
                 ScreenHolder.getInstance().getScreenHeight());
