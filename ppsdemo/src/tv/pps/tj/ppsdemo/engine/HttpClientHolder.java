@@ -2,6 +2,7 @@ package tv.pps.tj.ppsdemo.engine;
 
 import android.content.Context;
 import com.xengine.android.session.http.XHttp;
+import com.xengine.android.session.http.apache.XApacheHttpClient;
 import com.xengine.android.session.http.java.XJavaHttpClient;
 
 /**
@@ -27,16 +28,16 @@ public class HttpClientHolder {
 
     public static synchronized XHttp getMainHttpClient() {
         if (mainClient == null) {
-//            mainClient = new XApacheHttpClient(context, userAgent);
-            mainClient = new XJavaHttpClient(context);
+            mainClient = new XApacheHttpClient(context, userAgent);
+//            mainClient = new XJavaHttpClient(context, userAgent);
         }
         return mainClient;
     }
 
     public static synchronized XHttp getImageHttpClient() {
         if (imageClient == null) {
-//            imageClient = new XApacheHttpClient(context, userAgent);
-            imageClient = new XJavaHttpClient(context);
+            imageClient = new XApacheHttpClient(context, userAgent);
+//            imageClient = new XJavaHttpClient(context, userAgent);
         }
         return imageClient;
     }

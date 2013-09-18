@@ -31,6 +31,9 @@ public class MyImageScrollLocalLoader extends XScrollLocalLoader {
     public String getLocalImage(String imgUrl) {
         ImageSource imageSource = (ImageSource) DefaultDataRepo.
                 getInstance().getSource(SourceName.IMAGE);
-        return imageSource.getLocalImage(imgUrl);
+        if (imageSource != null)
+            return imageSource.getLocalImage(imgUrl);
+        else
+            return null;
     }
 }

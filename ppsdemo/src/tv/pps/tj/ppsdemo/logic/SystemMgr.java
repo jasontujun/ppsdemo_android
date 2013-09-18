@@ -3,6 +3,7 @@ package tv.pps.tj.ppsdemo.logic;
 import android.content.Context;
 import com.xengine.android.data.cache.DefaultDataRepo;
 import com.xengine.android.data.db.XSQLiteHelper;
+import com.xengine.android.media.image.processor.XAndroidImageProcessor;
 import com.xengine.android.system.file.XAndroidFileMgr;
 import com.xengine.android.system.file.XFileMgr;
 import tv.pps.tj.ppsdemo.R;
@@ -50,11 +51,13 @@ public class SystemMgr {
         fileMgr.setDir(DIR_DATA_XML, "data" + File.separator + "xml", false);
         // 初始化网络模块
         HttpClientHolder.init(context, "pps");
-        DownloadMgrHolder.init(HttpClientHolder.getImageHttpClient(),
-                ScreenHolder.getInstance().getScreenWidth(),
-                ScreenHolder.getInstance().getScreenHeight());
+        DownloadMgrHolder.init(HttpClientHolder.getImageHttpClient());
         UploadMgrHolder.init(HttpClientHolder.getImageHttpClient());
         // 初始化图片加载模块
+        XAndroidImageProcessor.getInstance().init(
+                ScreenHolder.getInstance().getScreenWidth(),
+                ScreenHolder.getInstance().getScreenHeight(),
+                fileMgr.getDir(XFileMgr.FILE_TYPE_TMP));
         MyImageViewRemoteLoader.getInstance().init(
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
