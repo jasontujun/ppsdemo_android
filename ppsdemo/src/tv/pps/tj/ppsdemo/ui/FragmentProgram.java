@@ -8,10 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import com.xengine.android.media.graphics.XScreen;
 import com.xengine.android.media.image.processor.XImageProcessor;
@@ -106,6 +103,13 @@ public class FragmentProgram extends Fragment {
         mAllLoadingProgressBar = (ProgressBar) rootView.findViewById(R.id.all_loading_progressbar);
         mAllLoadingTextView = (TextView) rootView.findViewById(R.id.all_loading_txt);
 
+        mAllLoadingFrame.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // 消除bug：在loading时候用户点击屏幕，会将触摸事件传递到下层的fragment上
+                return true;
+            }
+        });
         mMenuBtn.setOnClickListener(mMenuBtnListener);  // 设置菜单按钮的监听
         mPlayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,9 +236,15 @@ public class FragmentProgram extends Fragment {
             addPeopleItemToLinearFrame(null, mProgramActorFrame);
         }
         mProgramScore.setText("" + mProgramDetail.getVote());
-        mProgramBriefView.setText(mProgramDetail.getIntroduction());
+        if (TextUtils.isEmpty(mProgramDetail.getIntroduction()))
+            mProgramBriefView.setText("暂无");
+        else
+            mProgramBriefView.setText(mProgramDetail.getIntroduction());
         // 初始化播放来源
-        if (mProgramDetail.getThirdPartList() == null) {
+        boolean hasPps = mProgramDetail.getPpsEpisodes() != null
+                && mProgramDetail.getPpsEpisodes().size() > 0;
+        if (mProgramDetail.getThirdPartList() == null
+                || mProgramDetail.getThirdPartList().size() == 0) {
             mSrcBtn.setVisibility(View.GONE);
             mSrcGridView.setVisibility(View.GONE);
             mSelectedSrcIndex = -1;
@@ -242,7 +252,7 @@ public class FragmentProgram extends Fragment {
             mSrcBtn.setVisibility(View.VISIBLE);
             mSrcGridView.setVisibility(View.GONE);
             mSrcGridView.setAdapter(new SourceAdapter(getActivity(),
-                    mProgramDetail.getThirdPartList()));
+                    mProgramDetail.getThirdPartList(), hasPps));
             mSelectedSrcIndex = 0;
             // 初始化第三方来源的adpater
             if (mThirdPartAdapters == null) {
@@ -253,8 +263,8 @@ public class FragmentProgram extends Fragment {
                                     thirdPart.getThirdPartEpisodes()));
             }
         }
-        // 初始化pps来源的初始化
-        if (mPpsAdapter == null)
+        // 初始化pps来源的adapter(如果有)
+        if (mPpsAdapter == null && hasPps)
             mPpsAdapter = new AdapterEpisode(getActivity(),
                     mProgramDetail.getPpsEpisodes());
 
@@ -399,22 +409,28 @@ public class FragmentProgram extends Fragment {
     private class SourceAdapter extends BaseAdapter {
         private Context mContext;
         private List<ThirdPart> mThirdPartList;
+        private boolean mHasPps;
 
-        private SourceAdapter(Context context, List<ThirdPart> thirdPartList) {
+        private SourceAdapter(Context context, List<ThirdPart> thirdPartList,
+                              boolean hasPps) {
             mContext = context;
             mThirdPartList = thirdPartList;
+            mHasPps = hasPps;
         }
 
         @Override
         public int getCount() {
-            return mThirdPartList.size() + 1;
+            return mHasPps ? mThirdPartList.size() + 1 : mThirdPartList.size();
         }
 
         @Override
         public Object getItem(int i) {
-            if (i == mThirdPartList.size())
-                return null;
-            else
+            if (mHasPps) {
+                if (i == mThirdPartList.size())
+                    return null;
+                else
+                    return mThirdPartList.get(i);
+            } else
                 return mThirdPartList.get(i);
         }
 

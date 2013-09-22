@@ -53,6 +53,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:layout_marginRight="60dp"
+                android:singleLine="true"
                 android:text="古装、剧情"
                 android:textSize="12sp"
                 android:textColor="@color/dark_gray"/>

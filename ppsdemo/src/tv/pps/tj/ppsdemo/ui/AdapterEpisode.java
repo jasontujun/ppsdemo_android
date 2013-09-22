@@ -49,7 +49,10 @@ public class AdapterEpisode extends BaseAdapter {
                     (new ArrayList<Episode>(episodes), true));
         }
 
-        mSelectedTab = mAllTypeEpisodes.keySet().iterator().next();
+        if (mAllTypeEpisodes.size() > 0)
+            mSelectedTab = mAllTypeEpisodes.keySet().iterator().next();
+        else
+            mSelectedTab = null;
     }
 
     public String[] getTabList() {
@@ -70,12 +73,15 @@ public class AdapterEpisode extends BaseAdapter {
 
     public boolean isAscending() {
         WrapperData wrapperData = mAllTypeEpisodes.get(mSelectedTab);
+        if (wrapperData == null)
+            return false;
+
         return wrapperData.isAscending;
     }
 
     public void setAscending(boolean isAscending) {
         WrapperData wrapperData = mAllTypeEpisodes.get(mSelectedTab);
-        if (wrapperData.isAscending == isAscending)
+        if (wrapperData == null || wrapperData.isAscending == isAscending)
             return;
         wrapperData.isAscending = isAscending;
         Collections.reverse(wrapperData.episodes);
