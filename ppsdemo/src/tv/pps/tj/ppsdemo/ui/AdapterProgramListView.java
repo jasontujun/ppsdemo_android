@@ -119,7 +119,7 @@ public class AdapterProgramListView extends BaseAdapter
         XLog.d(TAG, "getView()" + holder.programImageView + " asyncoLoadBitmap. index=" + i);
         // 异步加载图片
         mImageScrollLoader.asyncLoadBitmap(mContext, programBase.getPosterUrl(),
-                holder.programImageView, XImageProcessor.ImageSize.SCREEN, null);
+                holder.programImageView, XImageProcessor.ImageSize.ORIGIN, null);
 
         return convertView;
     }

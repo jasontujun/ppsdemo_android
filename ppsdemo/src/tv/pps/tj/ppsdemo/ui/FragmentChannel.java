@@ -243,6 +243,7 @@ public class FragmentChannel extends Fragment {
                     mModeBtn.setImageResource(R.drawable.icon_top_grid);
                 }
                 globalStateSource.setChannelFrameMode(mCurrentMode);
+                MyImageScrollRemoteLoader.getInstance().onIdle();
                 mModeChangeAnimation = false;
             }
         });
@@ -545,6 +546,11 @@ public class FragmentChannel extends Fragment {
         view.startAnimation(animation);
     }
 
+    /**
+     * 启动TopBtn的渐显或渐隐动画
+     * @param view
+     * @param visible
+     */
     private void showTopBtnAnimation(final View view, final boolean visible) {
         if (view.getVisibility() == View.VISIBLE && visible)
             return;

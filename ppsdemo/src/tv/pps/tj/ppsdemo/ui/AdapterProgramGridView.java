@@ -104,7 +104,7 @@ public class AdapterProgramGridView extends BaseAdapter
         XLog.d(TAG, "getView() asyncoLoadBitmap. index=" + i);
         // 异步加载图片
         mImageScrollLoader.asyncLoadBitmap(mContext, programBase.getPosterUrl(),
-                holder.programImageView, XImageProcessor.ImageSize.SCREEN, null);
+                holder.programImageView, XImageProcessor.ImageSize.ORIGIN, null);
 
         return convertView;
     }
