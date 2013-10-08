@@ -59,18 +59,21 @@ public class SystemMgr {
                 ScreenHolder.getInstance().getScreenHeight(),
                 fileMgr.getDir(XFileMgr.FILE_TYPE_TMP));
         MyImageViewRemoteLoader.getInstance().init(
+                context,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small
         );
         MyImageScrollLocalLoader.getInstance().init(
+                context,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small
         );
         MyImageScrollRemoteLoader.getInstance().init(
+                context,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
                 R.drawable.default_image_bg_small,
